@@ -229,11 +229,11 @@ lazy val library =
       val jacksonModuleScala = "2.15.2"
       val json4s             = "4.0.6"
       val jsoniterScala      = "2.17.9"
-      val ninny              = "0.7.0"
+      val ninny              = "0.8.1"
       val play               = "2.9.2"
       val scalaTest          = "3.2.16"
       val upickle            = "1.6.0"
-      val zioJson            = "0.3.0"
+      val zioJson            = "0.6.0"
     }
     // format: off
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp

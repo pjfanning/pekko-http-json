@@ -55,7 +55,7 @@ object ExampleApp {
       }
     } ~ pathPrefix("stream") {
       post {
-        entity(as[SourceOf[Foo]]) { fooSource: SourceOf[Foo] =>
+        entity(as[SourceOf[Foo]]) { (fooSource: SourceOf[Foo]) =>
           import sys._
 
           Marshal(Source.single(Foo("a"))).to[RequestEntity]
