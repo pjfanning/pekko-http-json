@@ -41,10 +41,10 @@ final class AvroSupportSpec extends AsyncWordSpec with Matchers with BeforeAndAf
 
   import AvroSupportSpec._
 
-  private implicit val system    = ActorSystem()
-  private implicit val schemaFor = SchemaFor[Foo]
-  private implicit val encoder   = Encoder[Foo]
-  private implicit val decoder   = Decoder[Foo]
+  private implicit val system: ActorSystem = ActorSystem()
+  private implicit val schemaFor           = SchemaFor[Foo]
+  private implicit val encoder             = Encoder[Foo]
+  private implicit val decoder             = Decoder[Foo]
 
   "AvroSupport" should {
     "enable marshalling and unmarshalling objects for generic derivation" in {
