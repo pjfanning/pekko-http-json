@@ -16,6 +16,11 @@ pekko-http-json provides JSON (un)marshalling support for [Apache Pekko HTTP](ht
 - [AVSystem GenCodec](https://github.com/AVSystem/scala-commons/blob/master/docs/GenCodec.md)
 - [circe](https://circe.github.io/circe/)
 - [Jackson](https://github.com/FasterXML/jackson) via [Scala Module](https://github.com/FasterXML/jackson-module-scala) by default
+  - pekko-http-jackson v2.0.x supports Jackson 2.14
+  - pekko-http-jackson v2.1.x supports Jackson 2.15
+    - Jackson 2.15 users should read about [StreamReadConstraints](https://javadoc.io/static/com.fasterxml.jackson.core/jackson-core/2.15.2/com/fasterxml/jackson/core/StreamReadConstraints.html)
+    - pekko-http-jackson uses the default constraints but you can override them by overriding the configs in [reference.conf](https://github.com/pjfanning/pekko-http-json/blob/main/pekko-http-jackson/src/main/resources/reference.conf)
+    - you can override the configs by adding an application.conf file to your project ([Lightbend Config docs](https://github.com/lightbend/config))
 - [Json4s](https://github.com/json4s/json4s)
 - [jsoniter-scala](https://github.com/plokhotnyuk/jsoniter-scala)
 - [ninny](https://nrktkt.github.io/ninny-json/USERGUIDE)
