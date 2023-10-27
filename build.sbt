@@ -28,8 +28,8 @@ inThisBuild(
         url("https://github.com/pjfanning")
       ),
     ),
-    scalaVersion       := "2.13.11",
-    crossScalaVersions := Seq(scalaVersion.value, "2.12.18"),
+    scalaVersion       := "2.13.12",
+    crossScalaVersions := Seq("2.13.12", "2.12.18"),
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -45,7 +45,7 @@ inThisBuild(
 )
 
 val withScala3 = Seq(
-  crossScalaVersions += "3.3.0",
+  crossScalaVersions += "3.3.1",
 )
 
 // *****************************************************************************
@@ -155,7 +155,7 @@ lazy val `pekko-http-ninny` =
 
 lazy val `pekko-http-play-json` =
   project
-    .settings(commonSettings)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -223,17 +223,17 @@ lazy val library =
     object Version {
       val pekko              = "1.0.1"
       val pekkoHttp          = "1.0.0"
-      val argonaut           = "6.3.8"
+      val argonaut           = "6.3.9"
       val avro4s             = "4.1.1"
       val circe              = "0.14.1"
-      val jacksonModuleScala = "2.15.2"
+      val jacksonModuleScala = "2.15.3"
       val json4s             = "4.0.6"
-      val jsoniterScala      = "2.23.2"
-      val ninny              = "0.8.1"
-      val play               = "2.9.2"
-      val scalaTest          = "3.2.16"
-      val upickle            = "3.1.2"
-      val zioJson            = "0.6.0"
+      val jsoniterScala      = "2.24.2"
+      val ninny              = "0.8.2"
+      val play               = "2.10.2"
+      val scalaTest          = "3.2.17"
+      val upickle            = "3.1.3"
+      val zioJson            = "0.6.2"
     }
     // format: off
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
