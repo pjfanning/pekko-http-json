@@ -16,7 +16,12 @@
 
 package com.github.pjfanning.pekkohttpjackson
 
-import com.fasterxml.jackson.core.{ JsonFactory, JsonFactoryBuilder, StreamReadConstraints }
+import com.fasterxml.jackson.core.{
+  JsonFactory,
+  JsonFactoryBuilder,
+  StreamReadConstraints,
+  StreamWriteConstraints
+}
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
 import org.apache.pekko.http.javadsl.marshallers.jackson.Jackson
 import org.apache.pekko.http.scaladsl.common.EntityStreamingSupport
@@ -63,6 +68,12 @@ object JacksonSupport extends JacksonSupport {
       .maxNestingDepth(configFactory.getInt("pekko-http-json.jackson.read.max-nesting-depth"))
       .maxNumberLength(configFactory.getInt("pekko-http-json.jackson.read.max-number-length"))
       .maxStringLength(configFactory.getInt("pekko-http-json.jackson.read.max-string-length"))
+      .maxNameLength(configFactory.getInt("pekko-http-json.jackson.read.max-name-length"))
+      .maxDocumentLength(configFactory.getInt("pekko-http-json.jackson.read.max-document-length"))
+      .build()
+    val streamWriteConstraints = StreamWriteConstraints
+      .builder()
+      .maxNestingDepth(configFactory.getInt("pekko-http-json.jackson.write.max-nesting-depth"))
       .build()
     val jsonFactoryBuilder: JsonFactoryBuilder = JsonFactory
       .builder()
