@@ -62,23 +62,24 @@ object JacksonSupport extends JacksonSupport {
       .build() :: ClassTagExtensions
 
   private def createJsonFactory(): JsonFactory = {
-    val configFactory = ConfigFactory.load()
+    val jacksonConfig = ConfigFactory.load().getConfig("pekko-http-json.jackson")
     val streamReadConstraints = StreamReadConstraints
       .builder()
-      .maxNestingDepth(configFactory.getInt("pekko-http-json.jackson.read.max-nesting-depth"))
-      .maxNumberLength(configFactory.getInt("pekko-http-json.jackson.read.max-number-length"))
-      .maxStringLength(configFactory.getInt("pekko-http-json.jackson.read.max-string-length"))
-      .maxNameLength(configFactory.getInt("pekko-http-json.jackson.read.max-name-length"))
-      .maxDocumentLength(configFactory.getInt("pekko-http-json.jackson.read.max-document-length"))
+      .maxNestingDepth(jacksonConfig.getInt("read.max-nesting-depth"))
+      .maxNumberLength(jacksonConfig.getInt("read.max-number-length"))
+      .maxStringLength(jacksonConfig.getInt("read.max-string-length"))
+      .maxNameLength(jacksonConfig.getInt("read.max-name-length"))
+      .maxDocumentLength(jacksonConfig.getInt("read.max-document-length"))
       .build()
     val streamWriteConstraints = StreamWriteConstraints
       .builder()
-      .maxNestingDepth(configFactory.getInt("pekko-http-json.jackson.write.max-nesting-depth"))
+      .maxNestingDepth(jacksonConfig.getInt("write.max-nesting-depth"))
       .build()
     val jsonFactoryBuilder: JsonFactoryBuilder = JsonFactory
       .builder()
-      .streamReadConstraints(streamReadConstraints)
       .asInstanceOf[JsonFactoryBuilder]
+      .streamReadConstraints(streamReadConstraints)
+      .streamWriteConstraints(streamWriteConstraints)
     jsonFactoryBuilder.build()
   }
 }
