@@ -62,6 +62,7 @@ object JacksonSupport extends JacksonSupport {
       .build() :: ClassTagExtensions
 
   private def createJsonFactory(): JsonFactory = {
+    val jacksonConfig = ConfigFactory.load().getConfig("pekko-http-json.jackson")
     val streamReadConstraints = StreamReadConstraints
       .builder()
       .maxNestingDepth(jacksonConfig.getInt("read.max-nesting-depth"))
@@ -89,9 +90,7 @@ object JacksonSupport extends JacksonSupport {
 trait JacksonSupport {
   type SourceOf[A] = Source[A, _]
 
-  import JacksonSupport.defaultObjectMapper
-
-  protected val jacksonConfig = ConfigFactory.load().getConfig("pekko-http-json.jackson")
+  import JacksonSupport._
 
   def unmarshallerContentTypes: Seq[ContentTypeRange] =
     mediaTypes.map(ContentTypeRange.apply)
