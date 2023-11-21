@@ -16,35 +16,22 @@
 
 package com.github.pjfanning.pekkohttpjackson
 
-import com.fasterxml.jackson.core.{
-  JsonFactory,
-  JsonFactoryBuilder,
-  StreamReadConstraints,
-  StreamWriteConstraints
-}
+import com.fasterxml.jackson.core.{JsonFactory, JsonFactoryBuilder, StreamReadConstraints, StreamWriteConstraints}
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
 import org.apache.pekko.http.javadsl.marshallers.jackson.Jackson
 import org.apache.pekko.http.scaladsl.common.EntityStreamingSupport
 import org.apache.pekko.http.scaladsl.marshalling._
-import org.apache.pekko.http.scaladsl.model.{
-  ContentTypeRange,
-  HttpEntity,
-  MediaType,
-  MessageEntity
-}
+import org.apache.pekko.http.scaladsl.model.{ContentTypeRange, HttpEntity, MediaType, MessageEntity}
 import org.apache.pekko.http.scaladsl.model.MediaTypes.`application/json`
-import org.apache.pekko.http.scaladsl.unmarshalling.{
-  FromEntityUnmarshaller,
-  Unmarshal,
-  Unmarshaller
-}
+import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshal, Unmarshaller}
 import org.apache.pekko.http.scaladsl.util.FastFuture
-import org.apache.pekko.stream.scaladsl.{ Flow, Source }
+import org.apache.pekko.stream.scaladsl.{Flow, Source}
 import org.apache.pekko.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, DefaultScalaModule, JavaTypeable }
-import com.typesafe.config.ConfigFactory
+import com.fasterxml.jackson.module.scala.{ClassTagExtensions, DefaultScalaModule, JavaTypeable}
+import com.github.pjfanning.pekkohttpjackson
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -54,33 +41,7 @@ import scala.util.control.NonFatal
   * Automatic to and from JSON marshalling/unmarshalling using an in-scope Jackson's ObjectMapper
   */
 object JacksonSupport extends JacksonSupport {
-
-  val defaultObjectMapper: ObjectMapper with ClassTagExtensions =
-    JsonMapper
-      .builder(createJsonFactory())
-      .addModule(DefaultScalaModule)
-      .build() :: ClassTagExtensions
-
-  private def createJsonFactory(): JsonFactory = {
-    val streamReadConstraints = StreamReadConstraints
-      .builder()
-      .maxNestingDepth(jacksonConfig.getInt("read.max-nesting-depth"))
-      .maxNumberLength(jacksonConfig.getInt("read.max-number-length"))
-      .maxStringLength(jacksonConfig.getInt("read.max-string-length"))
-      .maxNameLength(jacksonConfig.getInt("read.max-name-length"))
-      .maxDocumentLength(jacksonConfig.getInt("read.max-document-length"))
-      .build()
-    val streamWriteConstraints = StreamWriteConstraints
-      .builder()
-      .maxNestingDepth(jacksonConfig.getInt("write.max-nesting-depth"))
-      .build()
-    val jsonFactoryBuilder: JsonFactoryBuilder = JsonFactory
-      .builder()
-      .asInstanceOf[JsonFactoryBuilder]
-      .streamReadConstraints(streamReadConstraints)
-      .streamWriteConstraints(streamWriteConstraints)
-    jsonFactoryBuilder.build()
-  }
+  override val jacksonConfig: Config = ConfigFactory.load().getConfig("pekko-http-json.jackson")
 }
 
 /**
@@ -89,9 +50,36 @@ object JacksonSupport extends JacksonSupport {
 trait JacksonSupport {
   type SourceOf[A] = Source[A, _]
 
-  import JacksonSupport.defaultObjectMapper
+  protected def jacksonConfig: Config
 
-  protected val jacksonConfig = ConfigFactory.load().getConfig("pekko-http-json.jackson")
+  private lazy val defaultObjectMapper: ObjectMapper with ClassTagExtensions = createObjectMapper(jacksonConfig)
+
+  private def createObjectMapper(config: Config): ObjectMapper with ClassTagExtensions =
+    JsonMapper
+      .builder(createJsonFactory(config))
+      .addModule(DefaultScalaModule)
+      .build() :: ClassTagExtensions
+
+  private def createJsonFactory(config: Config): JsonFactory = {
+    val streamReadConstraints = StreamReadConstraints
+      .builder()
+      .maxNestingDepth(config.getInt("read.max-nesting-depth"))
+      .maxNumberLength(config.getInt("read.max-number-length"))
+      .maxStringLength(config.getInt("read.max-string-length"))
+      .maxNameLength(config.getInt("read.max-name-length"))
+      .maxDocumentLength(config.getInt("read.max-document-length"))
+      .build()
+    val streamWriteConstraints = StreamWriteConstraints
+      .builder()
+      .maxNestingDepth(config.getInt("write.max-nesting-depth"))
+      .build()
+    val jsonFactoryBuilder: JsonFactoryBuilder = JsonFactory
+      .builder()
+      .asInstanceOf[JsonFactoryBuilder]
+      .streamReadConstraints(streamReadConstraints)
+      .streamWriteConstraints(streamWriteConstraints)
+    jsonFactoryBuilder.build()
+  }
 
   def unmarshallerContentTypes: Seq[ContentTypeRange] =
     mediaTypes.map(ContentTypeRange.apply)

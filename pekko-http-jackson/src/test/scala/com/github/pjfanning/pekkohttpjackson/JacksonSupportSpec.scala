@@ -16,16 +16,18 @@
 
 package com.github.pjfanning.pekkohttpjackson
 
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.marshalling.Marshal
 import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.model.ContentTypes.{ `application/json`, `text/plain(UTF-8)` }
-import org.apache.pekko.http.scaladsl.unmarshalling.{ Unmarshal, Unmarshaller }
+import org.apache.pekko.http.scaladsl.model.ContentTypes.{`application/json`, `text/plain(UTF-8)`}
+import org.apache.pekko.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
-import org.apache.pekko.stream.scaladsl.{ Sink, Source }
+import org.apache.pekko.stream.scaladsl.{Sink, Source}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
+
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
@@ -101,6 +103,23 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
       final object CustomJacksonSupport extends JacksonSupport {
+        override protected val jacksonConfig: Config = JacksonSupport.jacksonConfig
+        override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
+      }
+      import CustomJacksonSupport._
+
+      val entity = HttpEntity(`application/json-home`, """{ "bar": "bar" }""")
+      Unmarshal(entity).to[Foo].map(_ shouldBe foo)
+    }
+
+    "apply max-document-size config" in {
+      val foo = Foo("bar")
+      val `application/json-home` =
+        MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
+
+      final object CustomJacksonSupport extends JacksonSupport {
+        override val jacksonConfig: Config = ConfigFactory.parseString("read.max-document-length=1")
+          .withFallback(JacksonSupport.jacksonConfig)
         override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
       }
       import CustomJacksonSupport._
