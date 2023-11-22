@@ -143,7 +143,7 @@ lazy val `pekko-http-jsoniter-scala` =
 
 lazy val `pekko-http-ninny` =
   project
-    .settings(commonSettings)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,

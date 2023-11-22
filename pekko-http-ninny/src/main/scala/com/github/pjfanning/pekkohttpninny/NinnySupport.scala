@@ -34,7 +34,8 @@ import org.apache.pekko.http.scaladsl.unmarshalling.{
 import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
-import io.github.kag0.ninny._
+import nrktkt.ninny._
+
 import java.nio.charset.StandardCharsets
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
