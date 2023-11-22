@@ -23,6 +23,7 @@ import org.apache.pekko.http.scaladsl.model.{ HttpRequest, RequestEntity }
 import org.apache.pekko.http.scaladsl.server.Directives
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 import org.apache.pekko.stream.scaladsl.Source
+import nrktkt.ninny._
 
 import scala.concurrent.duration._
 import scala.io.StdIn
@@ -30,6 +31,11 @@ import scala.io.StdIn
 object ExampleApp {
 
   private final case class Foo(bar: String)
+
+  private object Foo {
+    implicit val toJson: ToSomeJson[Foo] = foo => obj("bar" --> foo.bar)
+    implicit val fromJson: FromJson[Foo] = FromJson.fromSome(_.bar.to[String].map(Foo(_)))
+  }
 
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem = ActorSystem()
@@ -43,7 +49,6 @@ object ExampleApp {
   private def route(implicit sys: ActorSystem) = {
     import Directives._
     import NinnySupport._
-    import io.github.kag0.ninny.Auto._
 
     pathSingleSlash {
       post {

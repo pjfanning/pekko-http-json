@@ -23,10 +23,10 @@ import org.apache.pekko.http.scaladsl.model.ContentTypes.{ `application/json`, `
 import org.apache.pekko.http.scaladsl.unmarshalling.{ Unmarshal, Unmarshaller }
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
 import org.apache.pekko.stream.scaladsl.{ Sink, Source }
-import io.github.kag0.ninny.JsonException
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
+import nrktkt.ninny._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
@@ -35,12 +35,16 @@ object NinnySupportSpec {
   final case class Foo(bar: String) {
     require(bar startsWith "bar", "bar must start with 'bar'!")
   }
+
+  private object Foo {
+    implicit val toJson: ToSomeJson[Foo] = foo => obj("bar" --> foo.bar)
+    implicit val fromJson: FromJson[Foo] = FromJson.fromSome(_.bar.to[String].map(Foo(_)))
+  }
 }
 
 final class NinnySupportSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
   import NinnySupport._
   import NinnySupportSpec._
-  import io.github.kag0.ninny.Auto._
 
   private implicit val system: ActorSystem = ActorSystem()
 
@@ -78,7 +82,7 @@ final class NinnySupportSpec extends AsyncWordSpec with Matchers with BeforeAndA
         .failed
         .map { err =>
           err shouldBe a[JsonException]
-          err should have message "Error converting bar from JSON: Expected string, got 5"
+          err should have message "Expected string, got 5"
         }
     }
 
