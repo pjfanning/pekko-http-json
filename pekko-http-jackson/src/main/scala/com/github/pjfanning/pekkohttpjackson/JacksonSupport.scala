@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.{
   JsonFactory,
   JsonFactoryBuilder,
   StreamReadConstraints,
+  StreamReadFeature,
   StreamWriteConstraints
 }
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
@@ -80,6 +81,7 @@ object JacksonSupport extends JacksonSupport {
       .asInstanceOf[JsonFactoryBuilder]
       .streamReadConstraints(streamReadConstraints)
       .streamWriteConstraints(streamWriteConstraints)
+      .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, jacksonConfig.getBoolean("read.feature.include-source-in-location"))
     jsonFactoryBuilder.build()
   }
 }
