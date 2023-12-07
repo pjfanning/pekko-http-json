@@ -16,6 +16,9 @@
 
 package com.github.pjfanning.pekkohttpjackson
 
+import com.fasterxml.jackson.core.StreamReadFeature
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.typesafe.config.ConfigFactory
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.marshalling.Marshal
 import org.apache.pekko.http.scaladsl.model._
@@ -26,6 +29,7 @@ import org.apache.pekko.stream.scaladsl.{ Sink, Source }
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
+
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
@@ -107,6 +111,20 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
 
       val entity = HttpEntity(`application/json-home`, """{ "bar": "bar" }""")
       Unmarshal(entity).to[Foo].map(_ shouldBe foo)
+    }
+
+    "respect pekko-http-json.jackson.read.feature.include-source-in-location" in {
+      val defaultFactory = JacksonSupport.createJsonFactory(JacksonSupport.jacksonConfig)
+      defaultFactory.isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe false
+      val testCfg = ConfigFactory
+        .parseString("read.feature.include-source-in-location=true")
+        .withFallback(JacksonSupport.jacksonConfig)
+      val testFactory = JacksonSupport.createJsonFactory(testCfg)
+      testFactory.isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe true
+      JsonMapper
+        .builder(testFactory)
+        .build()
+        .isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe true
     }
   }
 

@@ -45,7 +45,7 @@ import org.apache.pekko.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, DefaultScalaModule, JavaTypeable }
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -56,34 +56,39 @@ import scala.util.control.NonFatal
   */
 object JacksonSupport extends JacksonSupport {
 
-  val defaultObjectMapper: ObjectMapper with ClassTagExtensions =
-    JsonMapper
-      .builder(createJsonFactory())
-      .addModule(DefaultScalaModule)
-      .build() :: ClassTagExtensions
+  private[pekkohttpjackson] val jacksonConfig =
+    ConfigFactory.load().getConfig("pekko-http-json.jackson")
 
-  private def createJsonFactory(): JsonFactory = {
-    val jacksonConfig = ConfigFactory.load().getConfig("pekko-http-json.jackson")
+  private[pekkohttpjackson] def createJsonFactory(config: Config): JsonFactory = {
     val streamReadConstraints = StreamReadConstraints
       .builder()
-      .maxNestingDepth(jacksonConfig.getInt("read.max-nesting-depth"))
-      .maxNumberLength(jacksonConfig.getInt("read.max-number-length"))
-      .maxStringLength(jacksonConfig.getInt("read.max-string-length"))
-      .maxNameLength(jacksonConfig.getInt("read.max-name-length"))
-      .maxDocumentLength(jacksonConfig.getInt("read.max-document-length"))
+      .maxNestingDepth(config.getInt("read.max-nesting-depth"))
+      .maxNumberLength(config.getInt("read.max-number-length"))
+      .maxStringLength(config.getInt("read.max-string-length"))
+      .maxNameLength(config.getInt("read.max-name-length"))
+      .maxDocumentLength(config.getInt("read.max-document-length"))
       .build()
     val streamWriteConstraints = StreamWriteConstraints
       .builder()
-      .maxNestingDepth(jacksonConfig.getInt("write.max-nesting-depth"))
+      .maxNestingDepth(config.getInt("write.max-nesting-depth"))
       .build()
     val jsonFactoryBuilder: JsonFactoryBuilder = JsonFactory
       .builder()
       .asInstanceOf[JsonFactoryBuilder]
       .streamReadConstraints(streamReadConstraints)
       .streamWriteConstraints(streamWriteConstraints)
-      .configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, jacksonConfig.getBoolean("read.feature.include-source-in-location"))
+      .configure(
+        StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION,
+        config.getBoolean("read.feature.include-source-in-location")
+      )
     jsonFactoryBuilder.build()
   }
+
+  val defaultObjectMapper: ObjectMapper with ClassTagExtensions =
+    JsonMapper
+      .builder(createJsonFactory(jacksonConfig))
+      .addModule(DefaultScalaModule)
+      .build() :: ClassTagExtensions
 }
 
 /**
