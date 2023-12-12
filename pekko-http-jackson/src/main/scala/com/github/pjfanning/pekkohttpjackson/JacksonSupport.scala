@@ -50,6 +50,7 @@ import com.fasterxml.jackson.core.{
   StreamReadFeature,
   StreamWriteConstraints
 }
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.{ Module, ObjectMapper }
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
@@ -117,8 +118,16 @@ object JacksonSupport extends JacksonSupport {
   }
 
   private def loadModule(fcqn: String): Module = {
-    val inst = Try(Class.forName(fcqn).getConstructor().newInstance())
-      .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
+    val inst = if (fcqn == "com.fasterxml.jackson.module.paramnames.ParameterNamesModule") {
+      // matches the support for this module that appears in pekko-serialization-jackson
+      Class
+        .forName(fcqn)
+        .getConstructor(classOf[JsonCreator.Mode])
+        .newInstance(JsonCreator.Mode.PROPERTIES)
+    } else {
+      Try(Class.forName(fcqn).getConstructor().newInstance())
+        .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
+    }
     inst.asInstanceOf[Module]
   }
 }
