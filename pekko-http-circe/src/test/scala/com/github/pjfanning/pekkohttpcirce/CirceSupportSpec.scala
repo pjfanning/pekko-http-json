@@ -23,6 +23,7 @@ import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
 import org.apache.pekko.http.scaladsl.unmarshalling.{ Unmarshal, Unmarshaller }
 import cats.data.{ NonEmptyList, ValidatedNel }
+import cats.implicits.toShow
 import io.circe.CursorOp.DownField
 import io.circe.{ DecodingFailure, ParsingFailure, Printer }
 import org.scalatest.concurrent.ScalaFutures
@@ -60,7 +61,7 @@ final class CirceSupportSpec
   /**
     * Specs common to both [[FailFastCirceSupport]] and [[ErrorAccumulatingCirceSupport]]
     */
-  private def commonCirceSupport(support: BaseCirceSupport) = {
+  private def commonCirceSupport(support: BaseCirceSupport): Unit = {
     import io.circe.generic.auto._
     import support._
 
@@ -131,21 +132,24 @@ final class CirceSupportSpec
 
     "fail-fast and return only the first unmarshalling error" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
-      val error  = DecodingFailure("String", List(DownField("a")))
+      val error =
+        DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a")))
       Unmarshal(entity)
         .to[MultiFoo]
         .failed
-        .map(_ shouldBe error)
+        .map(_.getMessage shouldBe error.getMessage())
     }
 
     "fail-fast and return only the first unmarshalling error with safeUnmarshaller" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
-      val error  = DecodingFailure("String", List(DownField("a")))
+      val error: io.circe.Error =
+        DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a")))
       Unmarshal(entity)
         .to[Either[io.circe.Error, MultiFoo]]
         .futureValue
         .left
-        .value shouldBe error
+        .value
+        .getMessage shouldBe error.getMessage
     }
 
     "allow unmarshalling with passed in Content-Types" in {
@@ -182,8 +186,8 @@ final class CirceSupportSpec
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
       val errors =
         NonEmptyList.of(
-          DecodingFailure("String", List(DownField("a"))),
-          DecodingFailure("String", List(DownField("b")))
+          DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a"))),
+          DecodingFailure("Got value '2' with wrong type, expecting string", List(DownField("b")))
         )
       val errorMessage = ErrorAccumulatingCirceSupport.DecodingFailures(errors).getMessage
       Unmarshal(entity)
@@ -194,18 +198,24 @@ final class CirceSupportSpec
 
     "accumulate and return all unmarshalling errors with safeUnmarshaller" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
-      val errors =
+      val errors: NonEmptyList[DecodingFailure] =
         NonEmptyList.of(
-          DecodingFailure("String", List(DownField("a"))),
-          DecodingFailure("String", List(DownField("b")))
+          DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a"))),
+          DecodingFailure("Got value '2' with wrong type, expecting string", List(DownField("b")))
         )
       val errorMessage = ErrorAccumulatingCirceSupport.DecodingFailures(errors).getMessage
-      Unmarshal(entity)
+      val result: String = Unmarshal(entity)
         .to[ValidatedNel[io.circe.Error, MultiFoo]]
         .futureValue
         .toEither
         .left
-        .value shouldBe errors
+        .value
+        .collect { case df: DecodingFailure =>
+          df.show
+        }
+        .mkString("\n")
+
+      errorMessage shouldBe result
     }
 
     "allow unmarshalling with passed in Content-Types" in {
