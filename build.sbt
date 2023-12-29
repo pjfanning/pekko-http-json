@@ -221,12 +221,12 @@ lazy val commonSettings =
 lazy val library =
   new {
     object Version {
-      val pekko              = "1.0.1"
+      val pekko              = "1.0.2"
       val pekkoHttp          = "1.0.0"
       val argonaut           = "6.3.9"
       val avro4s             = "4.1.1"
       val circe              = "0.14.1"
-      val jacksonModuleScala = "2.16.0"
+      val jacksonModuleScala = "2.16.1"
       val json4s             = "4.0.7"
       val jsoniterScala      = "2.24.4"
       val ninny              = "0.8.2"
