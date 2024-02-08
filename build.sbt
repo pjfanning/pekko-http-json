@@ -222,17 +222,17 @@ lazy val library =
   new {
     object Version {
       val pekko              = "1.0.2"
-      val pekkoHttp          = "1.0.0"
+      val pekkoHttp          = "1.0.1"
       val argonaut           = "6.3.9"
       val avro4s             = "4.1.1"
       val circe              = "0.14.6"
       val jacksonModuleScala = "2.16.1"
       val json4s             = "4.0.7"
-      val jsoniterScala      = "2.26.2"
+      val jsoniterScala      = "2.28.1"
       val ninny              = "0.8.2"
-      val play               = "3.0.1"
-      val scalaTest          = "3.2.17"
-      val upickle            = "3.1.3"
+      val play               = "3.0.2"
+      val scalaTest          = "3.2.18"
+      val upickle            = "3.1.4"
       val zioJson            = "0.6.2"
     }
     // format: off
