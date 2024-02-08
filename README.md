@@ -11,7 +11,7 @@ Releases are pushed to maven Central. Snapshots are pushed to Sonatype. See belo
 This is a fork of [akka-http-json](https://github.com/hseeberger/akka-http-json). Thanks to Heiko Seeberger and all those who contributed to akka-http-json.
 
 pekko-http-json provides JSON (un)marshalling support for [Apache Pekko HTTP](https://github.com/apache/incubator-pekko-http) via the following JSON libraries:
-- [Argonaut](http://argonaut.io)
+- [Argonaut](https://github.com/argonaut-io/argonaut)
 - [avro4s](https://github.com/sksamuel/avro4s)
 - [AVSystem GenCodec](https://github.com/AVSystem/scala-commons/blob/master/docs/GenCodec.md)
 - [circe](https://circe.github.io/circe/)
