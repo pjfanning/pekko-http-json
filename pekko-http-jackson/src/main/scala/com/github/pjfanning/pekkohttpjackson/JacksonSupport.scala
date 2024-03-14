@@ -43,13 +43,6 @@ import org.apache.pekko.http.scaladsl.unmarshalling.{
 import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
-import com.fasterxml.jackson.core.{
-  JsonFactory,
-  JsonFactoryBuilder,
-  StreamReadConstraints,
-  StreamReadFeature,
-  StreamWriteConstraints
-}
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.{ Module, ObjectMapper }
 import com.fasterxml.jackson.databind.json.JsonMapper
