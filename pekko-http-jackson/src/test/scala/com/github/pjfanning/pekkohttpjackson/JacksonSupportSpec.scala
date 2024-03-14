@@ -160,6 +160,20 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
         .build()
         .isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe true
     }
+
+    "support loading jackson-module-parameter-names" in {
+      val testCfg = ConfigFactory
+        .parseString(
+          """jackson-modules += "com.fasterxml.jackson.module.paramnames.ParameterNamesModule""""
+        )
+        .withFallback(JacksonSupport.jacksonConfig)
+        .resolve()
+      val mapper = JacksonSupport.createObjectMapper(testCfg)
+      mapper.getRegisteredModuleIds should contain("jackson-module-parameter-names")
+      mapper.getRegisteredModuleIds should contain(
+        "com.fasterxml.jackson.module.scala.DefaultScalaModule"
+      )
+    }
   }
 
   override protected def afterAll() = {

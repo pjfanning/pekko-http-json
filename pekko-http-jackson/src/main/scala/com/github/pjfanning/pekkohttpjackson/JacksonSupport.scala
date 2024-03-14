@@ -99,13 +99,15 @@ object JacksonSupport extends JacksonSupport {
       case other => throw new IllegalArgumentException(s"Unknown recycler-pool: $other")
     }
 
-  import org.apache.pekko.util.ccompat.JavaConverters._
+  val defaultObjectMapper: ObjectMapper with ClassTagExtensions = createObjectMapper(jacksonConfig)
 
-  private val configuredModules = jacksonConfig.getStringList("jackson-modules").asScala.toSeq
-  private val modules           = configuredModules.map(loadModule)
-
-  val defaultObjectMapper: ObjectMapper with ClassTagExtensions = {
-    val builder = JsonMapper.builder(createJsonFactory(jacksonConfig))
+  private[pekkohttpjackson] def createObjectMapper(
+      config: Config
+  ): ObjectMapper with ClassTagExtensions = {
+    val builder = JsonMapper.builder(createJsonFactory(config))
+    import org.apache.pekko.util.ccompat.JavaConverters._
+    val configuredModules = config.getStringList("jackson-modules").asScala.toSeq
+    val modules           = configuredModules.map(loadModule)
     modules.foreach(builder.addModule)
     builder.build() :: ClassTagExtensions
   }
