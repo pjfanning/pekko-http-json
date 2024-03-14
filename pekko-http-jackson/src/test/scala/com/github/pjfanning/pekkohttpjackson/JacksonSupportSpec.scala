@@ -113,6 +113,28 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
       Unmarshal(entity).to[Foo].map(_ shouldBe foo)
     }
 
+    "default the stream read constraints" in {
+      val defaultFactory = JacksonSupport.createJsonFactory(JacksonSupport.jacksonConfig)
+      val src            = defaultFactory.streamReadConstraints()
+      src.getMaxNestingDepth shouldEqual 1000
+      src.getMaxNumberLength shouldEqual 1000
+      src.getMaxStringLength shouldEqual 20000000
+      src.getMaxNameLength shouldEqual 50000
+      src.getMaxDocumentLength shouldEqual -1
+    }
+
+    "default the stream write constraints" in {
+      val defaultFactory = JacksonSupport.createJsonFactory(JacksonSupport.jacksonConfig)
+      val swc            = defaultFactory.streamWriteConstraints()
+      swc.getMaxNestingDepth shouldEqual 1000
+    }
+
+    "default the buffer recycler" in {
+      val defaultFactory = JacksonSupport.createJsonFactory(JacksonSupport.jacksonConfig)
+      val pool           = defaultFactory._getRecyclerPool()
+      pool.getClass.getSimpleName shouldEqual "ThreadLocalPool"
+    }
+
     "respect pekko-http-json.jackson.read.feature.include-source-in-location" in {
       val defaultFactory = JacksonSupport.createJsonFactory(JacksonSupport.jacksonConfig)
       defaultFactory.isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe false
