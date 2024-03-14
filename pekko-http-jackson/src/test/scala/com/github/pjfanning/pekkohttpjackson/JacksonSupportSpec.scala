@@ -17,6 +17,7 @@
 package com.github.pjfanning.pekkohttpjackson
 
 import com.fasterxml.jackson.core.StreamReadFeature
+import com.fasterxml.jackson.core.util.JsonRecyclerPools.BoundedPool
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.typesafe.config.ConfigFactory
 import org.apache.pekko.actor.ActorSystem
@@ -133,6 +134,17 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
       val defaultFactory = JacksonSupport.createJsonFactory(JacksonSupport.jacksonConfig)
       val pool           = defaultFactory._getRecyclerPool()
       pool.getClass.getSimpleName shouldEqual "ThreadLocalPool"
+    }
+
+    "support config override for the buffer recycler" in {
+      val testCfg = ConfigFactory
+        .parseString("""buffer-recycler.pool-instance=bounded
+                       |buffer-recycler.bounded-pool-size=1234""".stripMargin)
+        .withFallback(JacksonSupport.jacksonConfig)
+      val factory = JacksonSupport.createJsonFactory(testCfg)
+      val pool    = factory._getRecyclerPool()
+      pool.getClass.getSimpleName shouldEqual "BoundedPool"
+      pool.asInstanceOf[BoundedPool].capacity() shouldEqual 1234
     }
 
     "respect pekko-http-json.jackson.read.feature.include-source-in-location" in {
