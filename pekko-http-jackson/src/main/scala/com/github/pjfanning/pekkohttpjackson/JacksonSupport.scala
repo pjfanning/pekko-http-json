@@ -43,9 +43,10 @@ import org.apache.pekko.http.scaladsl.unmarshalling.{
 import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.databind.{ Module, ObjectMapper }
 import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, DefaultScalaModule, JavaTypeable }
+import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
 import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.Future
@@ -86,12 +87,6 @@ object JacksonSupport extends JacksonSupport {
     jsonFactoryBuilder.build()
   }
 
-  val defaultObjectMapper: ObjectMapper with ClassTagExtensions =
-    JsonMapper
-      .builder(createJsonFactory(jacksonConfig))
-      .addModule(DefaultScalaModule)
-      .build() :: ClassTagExtensions
-
   private def getBufferRecyclerPool(cfg: Config): RecyclerPool[BufferRecycler] =
     cfg.getString("buffer-recycler.pool-instance") match {
       case "thread-local"            => JsonRecyclerPools.threadLocalPool()
@@ -103,6 +98,33 @@ object JacksonSupport extends JacksonSupport {
         JsonRecyclerPools.newBoundedPool(cfg.getInt("buffer-recycler.bounded-pool-size"))
       case other => throw new IllegalArgumentException(s"Unknown recycler-pool: $other")
     }
+
+  val defaultObjectMapper: ObjectMapper with ClassTagExtensions = createObjectMapper(jacksonConfig)
+
+  private[pekkohttpjackson] def createObjectMapper(
+      config: Config
+  ): ObjectMapper with ClassTagExtensions = {
+    val builder = JsonMapper.builder(createJsonFactory(config))
+    import org.apache.pekko.util.ccompat.JavaConverters._
+    val configuredModules = config.getStringList("jackson-modules").asScala.toSeq
+    val modules           = configuredModules.map(loadModule)
+    modules.foreach(builder.addModule)
+    builder.build() :: ClassTagExtensions
+  }
+
+  private def loadModule(fcqn: String): Module = {
+    val inst = if (fcqn == "com.fasterxml.jackson.module.paramnames.ParameterNamesModule") {
+      // matches the support for this module that appears in pekko-serialization-jackson
+      Class
+        .forName(fcqn)
+        .getConstructor(classOf[JsonCreator.Mode])
+        .newInstance(JsonCreator.Mode.PROPERTIES)
+    } else {
+      Try(Class.forName(fcqn).getConstructor().newInstance())
+        .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
+    }
+    inst.asInstanceOf[Module]
+  }
 }
 
 /**
