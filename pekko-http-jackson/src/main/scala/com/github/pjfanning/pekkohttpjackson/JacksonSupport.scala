@@ -16,6 +16,7 @@
 
 package com.github.pjfanning.pekkohttpjackson
 
+import com.fasterxml.jackson.core.util.{ BufferRecycler, JsonRecyclerPools, RecyclerPool }
 import com.fasterxml.jackson.core.{
   JsonFactory,
   JsonFactoryBuilder,
@@ -77,6 +78,7 @@ object JacksonSupport extends JacksonSupport {
       .asInstanceOf[JsonFactoryBuilder]
       .streamReadConstraints(streamReadConstraints)
       .streamWriteConstraints(streamWriteConstraints)
+      .recyclerPool(getBufferRecyclerPool(config))
       .configure(
         StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION,
         config.getBoolean("read.feature.include-source-in-location")
@@ -89,6 +91,18 @@ object JacksonSupport extends JacksonSupport {
       .builder(createJsonFactory(jacksonConfig))
       .addModule(DefaultScalaModule)
       .build() :: ClassTagExtensions
+
+  private def getBufferRecyclerPool(cfg: Config): RecyclerPool[BufferRecycler] =
+    cfg.getString("buffer-recycler.pool-instance") match {
+      case "thread-local"            => JsonRecyclerPools.threadLocalPool()
+      case "lock-free"               => JsonRecyclerPools.newLockFreePool()
+      case "shared-lock-free"        => JsonRecyclerPools.sharedLockFreePool()
+      case "concurrent-deque"        => JsonRecyclerPools.newConcurrentDequePool()
+      case "shared-concurrent-deque" => JsonRecyclerPools.sharedConcurrentDequePool()
+      case "bounded" =>
+        JsonRecyclerPools.newBoundedPool(cfg.getInt("buffer-recycler.bounded-pool-size"))
+      case other => throw new IllegalArgumentException(s"Unknown recycler-pool: $other")
+    }
 }
 
 /**
