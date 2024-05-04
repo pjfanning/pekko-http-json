@@ -28,8 +28,8 @@ inThisBuild(
         url("https://github.com/pjfanning")
       ),
     ),
-    scalaVersion       := "2.13.13",
-    crossScalaVersions := Seq("2.13.13", "2.12.19"),
+    scalaVersion       := "2.13.14",
+    crossScalaVersions := Seq("2.13.14", "2.12.19"),
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -226,14 +226,14 @@ lazy val library =
       val pekkoHttp          = "1.0.1"
       val argonaut           = "6.3.9"
       val avro4s             = "4.1.2"
-      val circe              = "0.14.6"
+      val circe              = "0.14.7"
       val jacksonModuleScala = "2.16.2"
       val json4s             = "4.0.7"
-      val jsoniterScala      = "2.28.4"
+      val jsoniterScala      = "2.28.5"
       val ninny              = "0.8.2"
-      val play               = "3.0.2"
+      val play               = "3.0.3"
       val scalaTest          = "3.2.18"
-      val upickle            = "3.2.0"
+      val upickle            = "3.3.0"
       val zioJson            = "0.6.2"
     }
     // format: off
