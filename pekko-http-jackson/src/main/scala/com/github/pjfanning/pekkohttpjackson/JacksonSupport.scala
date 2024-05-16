@@ -49,6 +49,7 @@ import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -205,12 +206,12 @@ trait JacksonSupport {
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): Unmarshaller[ByteString, A] =
     if (ByteStringInputStream.byteStringSupportsAsInputStream) {
-      Unmarshaller { _ => bs =>
-        Future.fromTry(Try(objectMapper.readValue[A](ByteStringInputStream(bs))))
+      Unmarshaller { ec => bs =>
+        Future(objectMapper.readValue[A](ByteStringInputStream(bs)))(ec)
       }
     } else {
-      Unmarshaller { _ => bs =>
-        Future.fromTry(Try(objectMapper.readValue[A](bs.toArrayUnsafe())))
+      Unmarshaller { ec => bs =>
+        Future(objectMapper.readValue[A](bs.toArrayUnsafe()))(ec)
       }
     }
 

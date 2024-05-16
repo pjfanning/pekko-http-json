@@ -36,11 +36,11 @@ import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import com.github.pjfanning.pekkohttpjson4s.Json4sSupport.ShouldWritePretty.False
-import java.lang.reflect.InvocationTargetException
 import org.json4s.{ Formats, MappingException, Serialization }
+
+import java.lang.reflect.InvocationTargetException
 import scala.collection.immutable.Seq
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -167,7 +167,7 @@ trait Json4sSupport {
       formats: Formats
   ): Unmarshaller[ByteString, A] = {
     val result: Unmarshaller[ByteString, A] =
-      Unmarshaller(_ => bs => Future.fromTry(Try(s.read(bs.utf8String))))
+      Unmarshaller(ec => bs => Future(s.read(bs.utf8String))(ec))
 
     result.recover(throwCause)
   }
