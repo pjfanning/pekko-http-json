@@ -204,8 +204,14 @@ trait JacksonSupport {
   implicit def fromByteStringUnmarshaller[A: JavaTypeable](implicit
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller { _ => bs =>
-      Future.fromTry(Try(objectMapper.readValue[A](ByteStringInputStream(bs))))
+    if (ByteStringInputStream.byteStringSupportsAsInputStream) {
+      Unmarshaller { _ => bs =>
+        Future.fromTry(Try(objectMapper.readValue[A](ByteStringInputStream(bs))))
+      }
+    } else {
+      Unmarshaller { _ => bs =>
+        Future.fromTry(Try(objectMapper.readValue[A](bs.toArrayUnsafe())))
+      }
     }
 
   /**

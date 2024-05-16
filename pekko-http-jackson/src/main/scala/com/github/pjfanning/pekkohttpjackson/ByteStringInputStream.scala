@@ -44,6 +44,8 @@ private[pekkohttpjackson] final object ByteStringInputStream {
       }
   }
 
+  val byteStringSupportsAsInputStream: Boolean = byteStringInputStreamMethodTypeOpt.isDefined
+
   private def getInputStreamUnsafe(bs: ByteString): InputStream =
     new ByteArrayInputStream(bs.toArrayUnsafe())
 }

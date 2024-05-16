@@ -36,6 +36,7 @@ import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import com.github.plokhotnyuk.jsoniter_scala.core._
+
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.Try
@@ -136,7 +137,12 @@ trait JsoniterScalaSupport {
       codec: JsonValueCodec[A],
       config: ReaderConfig = defaultReaderConfig
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Try(readFromStream(ByteStringInputStream(bs), config))))
+    if (ByteStringInputStream.byteStringSupportsAsInputStream)
+      Unmarshaller(_ =>
+        bs => Future.fromTry(Try(readFromStream(ByteStringInputStream(bs), config)))
+      )
+    else
+      Unmarshaller(_ => bs => Future.fromTry(Try(readFromArray(bs.toArrayUnsafe(), config))))
 
   /**
     * HTTP entity => `Source[A, _]`
