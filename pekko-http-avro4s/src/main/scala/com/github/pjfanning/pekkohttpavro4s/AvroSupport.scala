@@ -111,7 +111,7 @@ trait AvroSupport {
         val schema = AvroSchema[A]
 
         Try {
-          val bytes = bs.toArrayUnsafe
+          val bytes = bs.toArrayUnsafe()
           if (bytes.length == 0) throw Unmarshaller.NoContentException
           AvroInputStream.json[A].from(bytes).build(schema).iterator.next()
         }
