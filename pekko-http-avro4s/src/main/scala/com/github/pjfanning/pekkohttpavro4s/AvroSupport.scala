@@ -111,9 +111,8 @@ trait AvroSupport {
         val schema = AvroSchema[A]
 
         Try {
-          val bytes = bs.toArrayUnsafe()
-          if (bytes.length == 0) throw Unmarshaller.NoContentException
-          AvroInputStream.json[A].from(bytes).build(schema).iterator.next()
+          if (bs.isEmpty) throw Unmarshaller.NoContentException
+          AvroInputStream.json[A].from(bs.toByteBuffer).build(schema).iterator.next()
         }
       }
     }
@@ -124,7 +123,7 @@ trait AvroSupport {
   implicit def unmarshaller[A: SchemaFor: Decoder]: FromEntityUnmarshaller[A] = {
     val schema = AvroSchema[A]
     byteArrayUnmarshaller.map { bytes =>
-      if (bytes.length == 0) throw Unmarshaller.NoContentException
+      if (bytes.isEmpty) throw Unmarshaller.NoContentException
       AvroInputStream.json[A].from(bytes).build(schema).iterator.next()
     }
   }
