@@ -21,10 +21,12 @@ import com.fasterxml.jackson.core.util.{ BufferRecycler, JsonRecyclerPools, Recy
 import com.fasterxml.jackson.core.{
   JsonFactory,
   JsonFactoryBuilder,
+  JsonParser,
   StreamReadConstraints,
   StreamReadFeature,
   StreamWriteConstraints
 }
+import com.fasterxml.jackson.core.async.ByteBufferFeeder
 import com.fasterxml.jackson.databind.{ Module, ObjectMapper }
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
@@ -204,14 +206,14 @@ trait JacksonSupport {
   implicit def fromByteStringUnmarshaller[A: JavaTypeable](implicit
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): Unmarshaller[ByteString, A] =
-    if (ByteStringInputStream.byteStringSupportsAsInputStream) {
-      Unmarshaller { _ => bs =>
-        Future.fromTry(Try(objectMapper.readValue[A](ByteStringInputStream(bs))))
-      }
-    } else {
-      Unmarshaller { _ => bs =>
-        Future.fromTry(Try(objectMapper.readValue[A](bs.toArrayUnsafe())))
-      }
+    Unmarshaller { _ => bs =>
+      Future.fromTry(Try {
+        val parser = objectMapper.getFactory
+          .createNonBlockingByteBufferParser()
+          .asInstanceOf[JsonParser with ByteBufferFeeder]
+        parser.feedInput(bs.asByteBuffer)
+        objectMapper.readValue[A](parser)
+      })
     }
 
   /**
