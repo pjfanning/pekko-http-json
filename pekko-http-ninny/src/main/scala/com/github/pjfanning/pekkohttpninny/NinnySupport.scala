@@ -90,9 +90,7 @@ trait NinnySupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: FromJson]: Unmarshaller[ByteString, A] =
-    Unmarshaller(_ =>
-      bs => Future.fromTry(Json.parse(new String(bs.toArrayUnsafe(), StandardCharsets.UTF_8)).to[A])
-    )
+    Unmarshaller(_ => bs => Future.fromTry(Json.parse(bs.utf8String).to[A]))
 
   /**
     * HTTP entity => `Source[A, _]`
