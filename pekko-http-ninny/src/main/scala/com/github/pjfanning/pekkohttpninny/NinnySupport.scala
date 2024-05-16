@@ -47,8 +47,8 @@ trait NinnySupport {
   def unmarshallerContentTypes: Seq[ContentTypeRange] =
     mediaTypes.map(ContentTypeRange.apply)
 
-  def mediaTypes: Seq[MediaType.WithFixedCharset] =
-    List(`application/json`)
+  private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
+  def mediaTypes: Seq[MediaType.WithFixedCharset] = defaultMediaTypes
 
   /**
     * HTTP entity => `A`
