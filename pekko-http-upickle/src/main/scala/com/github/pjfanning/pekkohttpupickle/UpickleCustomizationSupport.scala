@@ -74,7 +74,7 @@ trait UpickleCustomizationSupport {
     mediaTypes.map(ContentTypeRange.apply)
 
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
-  def mediaTypes: Seq[MediaType.WithFixedCharset] = defaultMediaTypes
+  def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
 
   private def sourceByteStringMarshaller(
       mediaType: MediaType.WithFixedCharset

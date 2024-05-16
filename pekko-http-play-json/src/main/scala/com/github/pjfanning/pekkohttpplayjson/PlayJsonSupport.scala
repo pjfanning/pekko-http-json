@@ -58,7 +58,7 @@ trait PlayJsonSupport {
     mediaTypes.map(ContentTypeRange.apply)
 
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
-  def mediaTypes: Seq[MediaType.WithFixedCharset] = defaultMediaTypes
+  def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
 
   private val jsonStringUnmarshaller =
     Unmarshaller.byteStringUnmarshaller
@@ -140,7 +140,7 @@ trait PlayJsonSupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: Reads]: Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Try(Json.parse(bs.toArrayUnsafe()).as[A])))
+    Unmarshaller(_ => bs => Future.fromTry(Try(Json.parse(ByteStringInputStream(bs)).as[A])))
 
   /**
     * HTTP entity => `Source[A, _]`

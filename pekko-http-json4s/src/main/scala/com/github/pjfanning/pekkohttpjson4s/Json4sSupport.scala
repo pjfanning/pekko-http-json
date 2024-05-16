@@ -72,7 +72,7 @@ trait Json4sSupport {
     mediaTypes.map(ContentTypeRange.apply)
 
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
-  def mediaTypes: Seq[MediaType.WithFixedCharset] = defaultMediaTypes
+  def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
 
   private val jsonStringUnmarshaller =
     Unmarshaller.byteStringUnmarshaller

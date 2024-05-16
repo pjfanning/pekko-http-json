@@ -139,7 +139,7 @@ trait JacksonSupport {
     mediaTypes.map(ContentTypeRange.apply)
 
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
-  def mediaTypes: Seq[MediaType.WithFixedCharset] = defaultMediaTypes
+  def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
 
   private val jsonStringUnmarshaller =
     Unmarshaller.byteStringUnmarshaller
@@ -205,7 +205,7 @@ trait JacksonSupport {
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): Unmarshaller[ByteString, A] =
     Unmarshaller { _ => bs =>
-      Future.fromTry(Try(objectMapper.readValue[A](bs.toArrayUnsafe())))
+      Future.fromTry(Try(objectMapper.readValue[A](ByteStringInputStream(bs))))
     }
 
   /**
