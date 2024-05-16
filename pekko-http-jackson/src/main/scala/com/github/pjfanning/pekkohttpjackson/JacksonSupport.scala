@@ -16,6 +16,7 @@
 
 package com.github.pjfanning.pekkohttpjackson
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.core.util.{ BufferRecycler, JsonRecyclerPools, RecyclerPool }
 import com.fasterxml.jackson.core.{
   JsonFactory,
@@ -24,6 +25,10 @@ import com.fasterxml.jackson.core.{
   StreamReadFeature,
   StreamWriteConstraints
 }
+import com.fasterxml.jackson.databind.{ Module, ObjectMapper }
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
+import com.typesafe.config.{ Config, ConfigFactory }
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
 import org.apache.pekko.http.javadsl.marshallers.jackson.Jackson
 import org.apache.pekko.http.scaladsl.common.EntityStreamingSupport
@@ -43,11 +48,6 @@ import org.apache.pekko.http.scaladsl.unmarshalling.{
 import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.databind.{ Module, ObjectMapper }
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
-import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.Future
 import scala.util.Try
