@@ -205,7 +205,7 @@ trait JacksonSupport {
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): Unmarshaller[ByteString, A] =
     Unmarshaller { _ => bs =>
-      Future.fromTry(Try(objectMapper.readValue[A](bs.toArray)))
+      Future.fromTry(Try(objectMapper.readValue[A](bs.toArrayUnsafe())))
     }
 
   /**

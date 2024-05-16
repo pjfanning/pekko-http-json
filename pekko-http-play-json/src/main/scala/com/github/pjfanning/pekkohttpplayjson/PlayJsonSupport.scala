@@ -140,7 +140,7 @@ trait PlayJsonSupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: Reads]: Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Try(Json.parse(bs.toArray).as[A])))
+    Unmarshaller(_ => bs => Future.fromTry(Try(Json.parse(bs.toArrayUnsafe()).as[A])))
 
   /**
     * HTTP entity => `Source[A, _]`
