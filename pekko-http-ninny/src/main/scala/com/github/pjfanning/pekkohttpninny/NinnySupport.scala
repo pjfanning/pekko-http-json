@@ -36,9 +36,8 @@ import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import nrktkt.ninny._
 
-import java.nio.charset.StandardCharsets
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.collection.immutable.Seq
 import scala.util.control.NonFatal
 
 trait NinnySupport {
