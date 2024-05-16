@@ -24,7 +24,7 @@ import java.io.{ ByteArrayInputStream, InputStream }
 import java.lang.invoke.{ MethodHandles, MethodType }
 import scala.util.Try
 
-private[pekkohttpplayjson] final object ByteStringInputStream {
+private[pekkohttpplayjson] object ByteStringInputStream {
   private val byteStringInputStreamMethodTypeOpt = Try {
     val lookup                = MethodHandles.publicLookup()
     val inputStreamMethodType = MethodType.methodType(classOf[InputStream])

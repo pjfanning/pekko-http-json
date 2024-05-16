@@ -26,7 +26,7 @@ import org.apache.pekko
 import pekko.util.ByteString
 import pekko.util.ByteString.ByteString1C
 
-private[pekkohttpjackson] final object ByteStringInputStream {
+private[pekkohttpjackson] object ByteStringInputStream {
   private val byteStringInputStreamMethodTypeOpt = Try {
     val lookup                = MethodHandles.publicLookup()
     val inputStreamMethodType = MethodType.methodType(classOf[InputStream])
