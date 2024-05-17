@@ -247,7 +247,7 @@ trait JacksonSupport {
         def unordered =
           Flow[ByteString].mapAsyncUnordered(support.parallelism)(asyncParse)
 
-        FastFuture.successful {
+        Future.successful {
           entity.dataBytes
             .via(support.framingDecoder)
             .via(if (support.unordered) unordered else ordered)
