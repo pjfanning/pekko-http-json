@@ -40,6 +40,7 @@ import cats.syntax.either.catsSyntaxEither
 import cats.syntax.show.toShow
 import io.circe.{ Decoder, DecodingFailure, Encoder, Json, Printer, jawn }
 import io.circe.parser.parse
+
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -200,7 +201,14 @@ trait BaseCirceSupport {
   implicit def unmarshaller[A: Decoder]: FromEntityUnmarshaller[A]
 
   def byteStringJsonUnmarshaller: Unmarshaller[ByteString, Json] =
-    Unmarshaller(_ => bs => Future.fromTry(jawn.parseByteBuffer(bs.asByteBuffer).toTry))
+    Unmarshaller { ec => bs =>
+      Future {
+        jawn.parseByteBuffer(bs.asByteBuffer) match {
+          case Right(json) => json
+          case Left(pf)    => throw pf
+        }
+      }(ec)
+    }
 
   /**
     * HTTP entity => `Source[A, _]`

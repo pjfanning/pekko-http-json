@@ -38,7 +38,6 @@ import org.apache.pekko.util.ByteString
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Try
 import scala.util.control.NonFatal
 
 // This companion object only exists for binary compatibility as adding methods with default implementations
@@ -110,7 +109,7 @@ trait UpickleCustomizationSupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: api.Reader]: Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Try(api.read(bs.toArrayUnsafe()))))
+    Unmarshaller(ec => bs => Future(api.read(bs.toArrayUnsafe()))(ec))
 
   /**
     * HTTP entity => `A`

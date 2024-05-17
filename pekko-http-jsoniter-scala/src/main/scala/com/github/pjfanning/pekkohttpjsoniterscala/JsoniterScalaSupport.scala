@@ -39,7 +39,6 @@ import com.github.plokhotnyuk.jsoniter_scala.core._
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -137,7 +136,7 @@ trait JsoniterScalaSupport {
       codec: JsonValueCodec[A],
       config: ReaderConfig = defaultReaderConfig
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Try(readFromByteBuffer(bs.asByteBuffer, config))))
+    Unmarshaller(ec => bs => Future(readFromByteBuffer(bs.asByteBuffer, config))(ec))
 
   /**
     * HTTP entity => `Source[A, _]`

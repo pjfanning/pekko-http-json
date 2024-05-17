@@ -37,10 +37,10 @@ import com.sksamuel.avro4s.{
   Encoder,
   SchemaFor
 }
+
 import java.io.ByteArrayOutputStream
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -106,20 +106,17 @@ trait AvroSupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: SchemaFor: Decoder]: Unmarshaller[ByteString, A] =
-    Unmarshaller { _ => bs =>
-      Future.fromTry {
+    Unmarshaller { ec => bs =>
+      Future {
         val schema = AvroSchema[A]
-
-        Try {
-          if (bs.isEmpty) throw Unmarshaller.NoContentException
-          val builder =
-            if (ByteStringInputStream.byteStringSupportsAsInputStream)
-              AvroInputStream.json[A].from(ByteStringInputStream(bs))
-            else
-              AvroInputStream.json[A].from(bs.toArrayUnsafe())
-          builder.build(schema).iterator.next()
-        }
-      }
+        if (bs.isEmpty) throw Unmarshaller.NoContentException
+        val builder =
+          if (ByteStringInputStream.byteStringSupportsAsInputStream)
+            AvroInputStream.json[A].from(ByteStringInputStream(bs))
+          else
+            AvroInputStream.json[A].from(bs.toArrayUnsafe())
+        builder.build(schema).iterator.next()
+      }(ec)
     }
 
   /**

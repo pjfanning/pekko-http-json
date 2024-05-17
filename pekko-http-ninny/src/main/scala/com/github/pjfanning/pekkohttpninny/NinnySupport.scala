@@ -36,8 +36,9 @@ import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import nrktkt.ninny._
 
-import scala.concurrent.Future
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
 
 trait NinnySupport {
@@ -89,7 +90,15 @@ trait NinnySupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: FromJson]: Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Json.parse(bs.utf8String).to[A]))
+    Unmarshaller(ec =>
+      bs =>
+        Future {
+          Json.parse(bs.utf8String).to[A] match {
+            case Success(value)     => value
+            case Failure(exception) => throw exception
+          }
+        }(ec)
+    )
 
   /**
     * HTTP entity => `Source[A, _]`

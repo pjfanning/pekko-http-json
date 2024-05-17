@@ -31,9 +31,9 @@ import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import play.api.libs.json.{ JsError, JsResultException, JsValue, Json, Reads, Writes }
+
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -141,9 +141,9 @@ trait PlayJsonSupport {
     */
   implicit def fromByteStringUnmarshaller[A: Reads]: Unmarshaller[ByteString, A] =
     if (ByteStringInputStream.byteStringSupportsAsInputStream)
-      Unmarshaller(_ => bs => Future.fromTry(Try(Json.parse(ByteStringInputStream(bs)).as[A])))
+      Unmarshaller(ec => bs => Future(Json.parse(ByteStringInputStream(bs)).as[A])(ec))
     else
-      Unmarshaller(_ => bs => Future.fromTry(Try(Json.parse(bs.toArrayUnsafe()).as[A])))
+      Unmarshaller(ec => bs => Future(Json.parse(bs.toArrayUnsafe()).as[A])(ec))
 
   /**
     * HTTP entity => `Source[A, _]`
