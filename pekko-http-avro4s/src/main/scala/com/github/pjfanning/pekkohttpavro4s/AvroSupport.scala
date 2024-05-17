@@ -112,7 +112,12 @@ trait AvroSupport {
 
         Try {
           if (bs.isEmpty) throw Unmarshaller.NoContentException
-          AvroInputStream.json[A].from(bs.toByteBuffer).build(schema).iterator.next()
+          val builder =
+            if (ByteStringInputStream.byteStringSupportsAsInputStream)
+              AvroInputStream.json[A].from(ByteStringInputStream(bs))
+            else
+              AvroInputStream.json[A].from(bs.toArrayUnsafe())
+          builder.build(schema).iterator.next()
         }
       }
     }
