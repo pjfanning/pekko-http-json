@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package com.github.pjfanning.pekkohttpjackson
+package com.github.pjfanning.pekkohttpavro4s
+
+import org.apache.pekko.util.ByteString
+import org.apache.pekko.util.ByteString.ByteString1C
 
 import java.io.{ ByteArrayInputStream, InputStream }
 import java.lang.invoke.{ MethodHandles, MethodType }
-
 import scala.util.Try
 
-import org.apache.pekko
-import pekko.util.ByteString
-import pekko.util.ByteString.ByteString1C
-
-private[pekkohttpjackson] object ByteStringInputStream {
+private[pekkohttpavro4s] object ByteStringInputStream {
   private val byteStringInputStreamMethodTypeOpt = Try {
     val lookup                = MethodHandles.publicLookup()
     val inputStreamMethodType = MethodType.methodType(classOf[InputStream])
