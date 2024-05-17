@@ -211,7 +211,12 @@ trait JacksonSupport {
         val parser = objectMapper.getFactory
           .createNonBlockingByteBufferParser()
           .asInstanceOf[JsonParser with ByteBufferFeeder]
-        parser.feedInput(bs.asByteBuffer)
+        bs match {
+          case bs: ByteString.ByteStrings =>
+            bs.asByteBuffers.foreach(parser.feedInput)
+          case bytes =>
+            parser.feedInput(bytes.asByteBuffer)
+        }
         objectMapper.readValue[A](parser)
       })
     }
