@@ -137,7 +137,7 @@ trait JsoniterScalaSupport {
       codec: JsonValueCodec[A],
       config: ReaderConfig = defaultReaderConfig
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller(_ => bs => Future.fromTry(Try(readFromByteBuffer(bs.toByteBuffer, config))))
+    Unmarshaller(_ => bs => Future.fromTry(Try(readFromByteBuffer(bs.asByteBuffer, config))))
 
   /**
     * HTTP entity => `Source[A, _]`
