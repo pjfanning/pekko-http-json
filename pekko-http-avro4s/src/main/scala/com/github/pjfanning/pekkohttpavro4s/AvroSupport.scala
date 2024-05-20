@@ -27,6 +27,7 @@ import org.apache.pekko.http.scaladsl.unmarshalling.{
   Unmarshaller
 }
 import org.apache.pekko.http.scaladsl.util.FastFuture
+import org.apache.pekko.pekkohttpavro4s.ByteStringInputStream
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import com.sksamuel.avro4s.{
@@ -110,12 +111,12 @@ trait AvroSupport {
       Future {
         val schema = AvroSchema[A]
         if (bs.isEmpty) throw Unmarshaller.NoContentException
-        val builder =
-          if (ByteStringInputStream.byteStringSupportsAsInputStream)
-            AvroInputStream.json[A].from(ByteStringInputStream(bs))
-          else
-            AvroInputStream.json[A].from(bs.toArrayUnsafe())
-        builder.build(schema).iterator.next()
+        AvroInputStream
+          .json[A]
+          .from(ByteStringInputStream(bs))
+          .build(schema)
+          .iterator
+          .next()
       }(ec)
     }
 

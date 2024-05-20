@@ -28,6 +28,7 @@ import org.apache.pekko.http.scaladsl.model.{
 import org.apache.pekko.http.scaladsl.model.MediaTypes.`application/json`
 import org.apache.pekko.http.scaladsl.unmarshalling._
 import org.apache.pekko.http.scaladsl.util.FastFuture
+import org.apache.pekko.pekkohttpplayjson.ByteStringInputStream
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import play.api.libs.json.{ JsError, JsResultException, JsValue, Json, Reads, Writes }
@@ -140,10 +141,7 @@ trait PlayJsonSupport {
     *   unmarshaller for any `A` value
     */
   implicit def fromByteStringUnmarshaller[A: Reads]: Unmarshaller[ByteString, A] =
-    if (ByteStringInputStream.byteStringSupportsAsInputStream)
-      Unmarshaller(ec => bs => Future(Json.parse(ByteStringInputStream(bs)).as[A])(ec))
-    else
-      Unmarshaller(ec => bs => Future(Json.parse(bs.toArrayUnsafe()).as[A])(ec))
+    Unmarshaller(ec => bs => Future(Json.parse(ByteStringInputStream(bs)).as[A])(ec))
 
   /**
     * HTTP entity => `Source[A, _]`
