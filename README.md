@@ -23,6 +23,7 @@ pekko-http-json provides JSON (un)marshalling support for [Apache Pekko HTTP](ht
     - you can override the configs by adding an application.conf file to your project ([Lightbend Config docs](https://github.com/lightbend/config))
   - pekko-http-jackson v2.3.x supports Jackson 2.16
     - pekko-http-jackson uses the default Jackson constraints (including some new to Jackson 2.16) but you can override them by overriding the configs in [reference.conf](https://github.com/pjfanning/pekko-http-json/blob/main/pekko-http-jackson/src/main/resources/reference.conf)
+  - pekko-http-jackson v2.5.x supports Jackson 2.17
 - [Json4s](https://github.com/json4s/json4s)
 - [jsoniter-scala](https://github.com/plokhotnyuk/jsoniter-scala)
 - [ninny](https://nrktkt.github.io/ninny-json/USERGUIDE)
