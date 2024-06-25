@@ -222,7 +222,7 @@ lazy val commonSettings =
 lazy val library =
   new {
     object Version {
-      val pekko              = "1.0.2"
+      val pekko              = "1.0.3"
       val pekkoHttp          = "1.0.1"
       val argonaut           = "6.3.9"
       val avro4s             = "4.1.2"
@@ -232,7 +232,7 @@ lazy val library =
       val jsoniterScala      = "2.28.5"
       val ninny              = "0.8.2"
       val play               = "3.0.3"
-      val scalaTest          = "3.2.18"
+      val scalaTest          = "3.2.19"
       val upickle            = "3.3.1"
       val zioJson            = "0.6.2"
     }
