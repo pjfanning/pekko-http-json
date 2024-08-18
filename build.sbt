@@ -224,17 +224,17 @@ lazy val library =
     object Version {
       val pekko              = "1.0.3"
       val pekkoHttp          = "1.0.1"
-      val argonaut           = "6.3.9"
+      val argonaut           = "6.3.10"
       val avro4s             = "4.1.2"
       val circe              = "0.14.9"
-      val jacksonModuleScala = "2.17.1"
+      val jacksonModuleScala = "2.17.2"
       val json4s             = "4.0.7"
-      val jsoniterScala      = "2.28.5"
-      val ninny              = "0.8.2"
-      val play               = "3.0.3"
+      val jsoniterScala      = "2.30.7"
+      val ninny              = "0.9.1"
+      val play               = "3.0.4"
       val scalaTest          = "3.2.19"
-      val upickle            = "3.3.1"
-      val zioJson            = "0.6.2"
+      val upickle            = "4.0.0"
+      val zioJson            = "0.7.2"
     }
     // format: off
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
