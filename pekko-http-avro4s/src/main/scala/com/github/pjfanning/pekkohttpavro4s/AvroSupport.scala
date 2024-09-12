@@ -27,7 +27,6 @@ import org.apache.pekko.http.scaladsl.unmarshalling.{
   Unmarshaller
 }
 import org.apache.pekko.http.scaladsl.util.FastFuture
-import org.apache.pekko.pekkohttpavro4s.ByteStringInputStream
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import com.sksamuel.avro4s.{
@@ -113,7 +112,7 @@ trait AvroSupport {
         if (bs.isEmpty) throw Unmarshaller.NoContentException
         AvroInputStream
           .json[A]
-          .from(ByteStringInputStream(bs))
+          .from(bs.asInputStream)
           .build(schema)
           .iterator
           .next()
