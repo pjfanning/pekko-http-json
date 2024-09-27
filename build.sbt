@@ -28,8 +28,8 @@ inThisBuild(
         url("https://github.com/pjfanning")
       ),
     ),
-    scalaVersion       := "2.13.14",
-    crossScalaVersions := Seq("2.13.14", "2.12.20"),
+    scalaVersion       := "2.13.15",
+    crossScalaVersions := Seq("2.13.15", "2.12.20"),
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -45,7 +45,7 @@ inThisBuild(
 )
 
 val withScala3 = Seq(
-  crossScalaVersions += "3.3.3",
+  crossScalaVersions += "3.3.4",
 )
 
 // *****************************************************************************
