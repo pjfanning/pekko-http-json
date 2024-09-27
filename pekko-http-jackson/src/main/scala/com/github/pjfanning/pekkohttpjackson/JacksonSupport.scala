@@ -72,6 +72,7 @@ object JacksonSupport extends JacksonSupport {
       .maxStringLength(config.getInt("read.max-string-length"))
       .maxNameLength(config.getInt("read.max-name-length"))
       .maxDocumentLength(config.getInt("read.max-document-length"))
+      .maxTokenCount(config.getInt("read.max-token-count"))
       .build()
     val streamWriteConstraints = StreamWriteConstraints
       .builder()
