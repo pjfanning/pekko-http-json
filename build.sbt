@@ -224,7 +224,7 @@ lazy val library =
     object Version {
       val pekko              = "1.1.2"
       val pekkoHttp          = "1.1.0"
-      val argonaut           = "6.3.10"
+      val argonaut           = "6.3.11"
       val avro4s             = "4.1.2"
       val circe              = "0.14.10"
       val jacksonModuleScala = "2.18.0"
@@ -240,7 +240,7 @@ lazy val library =
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
     val pekkoHttpJacksonJava = "org.apache.pekko"                      %% "pekko-http-jackson"    % Version.pekkoHttp
     val pekkoStream          = "org.apache.pekko"                      %% "pekko-stream"          % Version.pekko
-    val argonaut             = "io.argonaut"                           %% "argonaut"              % Version.argonaut
+    val argonaut             = "io.github.argonaut-io"                           %% "argonaut"              % Version.argonaut
     val avro4sJson           = "com.sksamuel.avro4s"                   %% "avro4s-json"           % Version.avro4s
     val circe                = "io.circe"                              %% "circe-core"            % Version.circe
     val circeGeneric         = "io.circe"                              %% "circe-generic"         % Version.circe
