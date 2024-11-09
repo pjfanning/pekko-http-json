@@ -100,6 +100,7 @@ object JacksonSupport extends JacksonSupport {
       case "shared-concurrent-deque" => JsonRecyclerPools.sharedConcurrentDequePool()
       case "bounded" =>
         JsonRecyclerPools.newBoundedPool(cfg.getInt("buffer-recycler.bounded-pool-size"))
+      case "non-recycling"           => JsonRecyclerPools.nonRecyclingPool()
       case other => throw new IllegalArgumentException(s"Unknown recycler-pool: $other")
     }
 
