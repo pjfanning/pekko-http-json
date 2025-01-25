@@ -48,12 +48,11 @@ final class UpickleCustomizationSupportSpec
   import UpickleFoo._
 
   "UpickleCustomizationSupport" should {
-    "support custom configuration" in {
-      Marshal(123)
-        .to[RequestEntity]
-        .flatMap(Unmarshal(_).to[String])
-        .map(_ shouldBe "foo")
-    }
+    "support custom configuration" in
+    Marshal(123)
+      .to[RequestEntity]
+      .flatMap(Unmarshal(_).to[String])
+      .map(_ shouldBe "foo")
   }
 
   override protected def afterAll() = {

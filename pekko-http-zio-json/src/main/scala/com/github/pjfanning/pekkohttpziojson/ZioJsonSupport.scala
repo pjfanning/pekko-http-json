@@ -103,12 +103,10 @@ trait ZioJsonSupport {
       jd: JsonDecoder[A],
       rt: zio.Runtime[Any]
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller(_ =>
-      bs => {
-        val decoded = jd.decodeJsonStreamInput(ZStream.fromIterable(bs))
-        Unsafe.unsafeCompat(implicit u => rt.unsafe.runToFuture(decoded))
-      }
-    )
+    Unmarshaller { _ => bs =>
+      val decoded = jd.decodeJsonStreamInput(ZStream.fromIterable(bs))
+      Unsafe.unsafeCompat(implicit u => rt.unsafe.runToFuture(decoded))
+    }
 
   /**
     * `A` => HTTP entity
