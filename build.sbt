@@ -110,8 +110,7 @@ lazy val `pekko-http-jackson` =
         library.pekkoHttpJacksonJava,
         library.jacksonModuleScala,
         library.pekkoStream             % Provided,
-        library.scalaTest               % Test,
-        library.jacksonModuleParamNames % Test
+        library.scalaTest               % Test
       )
     )
 
@@ -246,7 +245,6 @@ lazy val library =
     val circeGeneric         = "io.circe"                              %% "circe-generic"         % Version.circe
     val circeParser          = "io.circe"                              %% "circe-parser"          % Version.circe
     val jacksonModuleScala   = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jacksonModuleScala
-    val jacksonModuleParamNames = "com.fasterxml.jackson.module"        % "jackson-module-parameter-names" % Version.jacksonModuleScala
     val json4sCore           = "org.json4s"                            %% "json4s-core"           % Version.json4s
     val json4sJackson        = "org.json4s"                            %% "json4s-jackson"        % Version.json4s
     val json4sNative         = "org.json4s"                            %% "json4s-native"         % Version.json4s
