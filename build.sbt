@@ -39,6 +39,7 @@ inThisBuild(
       "-Ywarn-unused:imports",
       "-target:jvm-1.8"
     ),
+    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
     scalafmtOnCompile := true,
     dynverSeparator   := "_" // the default `+` is not compatible with docker tags
   )
@@ -107,10 +108,22 @@ lazy val `pekko-http-jackson` =
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
-        library.jacksonModuleScala,
-        library.pekkoStream             % Provided,
-        library.scalaTest               % Test,
-        library.jacksonModuleParamNames % Test
+        library.jacksonModuleScala2,
+        library.pekkoStream              % Provided,
+        library.scalaTest                % Test,
+        library.jacksonModuleParamNames2 % Test
+      )
+    )
+
+lazy val `pekko-http-jackson3` =
+  project
+    .settings(commonSettings, withScala3)
+    .settings(
+      libraryDependencies ++= Seq(
+        library.pekkoHttp,
+        library.jacksonModuleScala3,
+        library.pekkoStream              % Provided,
+        library.scalaTest                % Test
       )
     )
 
@@ -226,7 +239,8 @@ lazy val library =
       val argonaut           = "6.3.11"
       val avro4s             = "4.1.2"
       val circe              = "0.14.10"
-      val jacksonModuleScala = "2.18.3"
+      val jackson2           = "2.18.3"
+      val jackson3           = "3.0.0-rc1-SNAPSHOT"
       val json4s             = "4.0.7"
       val jsoniterScala      = "2.33.2"
       val ninny              = "0.9.1"
@@ -243,8 +257,9 @@ lazy val library =
     val circe                = "io.circe"                              %% "circe-core"            % Version.circe
     val circeGeneric         = "io.circe"                              %% "circe-generic"         % Version.circe
     val circeParser          = "io.circe"                              %% "circe-parser"          % Version.circe
-    val jacksonModuleScala   = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jacksonModuleScala
-    val jacksonModuleParamNames = "com.fasterxml.jackson.module"        % "jackson-module-parameter-names" % Version.jacksonModuleScala
+    val jacksonModuleScala2  = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jackson2
+    val jacksonModuleParamNames2 = "com.fasterxml.jackson.module"        % "jackson-module-parameter-names" % Version.jackson2
+    val jacksonModuleScala3  = "tools.jackson.module"                  %% "jackson-module-scala"  % Version.jackson2
     val json4sCore           = "org.json4s"                            %% "json4s-core"           % Version.json4s
     val json4sJackson        = "org.json4s"                            %% "json4s-jackson"        % Version.json4s
     val json4sNative         = "org.json4s"                            %% "json4s-native"         % Version.json4s
