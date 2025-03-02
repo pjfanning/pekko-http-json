@@ -20,9 +20,9 @@ import org.apache.pekko.http.javadsl.marshalling.Marshaller;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-public class Jackson {
+final class Jackson {
 
-    public static <T> Marshaller<T, RequestEntity> marshaller(ObjectMapper mapper) {
+    static <T> Marshaller<T, RequestEntity> marshaller(ObjectMapper mapper) {
         return Marshaller.wrapEntity(
                 u -> toJSON(mapper, u), Marshaller.stringToEntity(), MediaTypes.APPLICATION_JSON);
     }
