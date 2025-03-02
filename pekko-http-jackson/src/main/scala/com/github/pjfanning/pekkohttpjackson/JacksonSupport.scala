@@ -220,6 +220,7 @@ trait JacksonSupport {
             case bytes =>
               parser.feedInput(bytes.asByteBuffer)
           }
+          parser.endOfInput()
           objectMapper.readValue[A](parser)
         } finally
           parser.close()
