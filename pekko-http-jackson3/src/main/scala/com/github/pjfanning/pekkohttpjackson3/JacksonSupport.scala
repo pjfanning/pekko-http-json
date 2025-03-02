@@ -27,7 +27,7 @@ import tools.jackson.core.{
 }
 import tools.jackson.core.json.{ JsonFactory, JsonFactoryBuilder }
 import tools.jackson.core.async.ByteBufferFeeder
-import tools.jackson.databind.{ JacksonModule, ObjectMapper }
+import tools.jackson.databind.{ DeserializationFeature, JacksonModule, ObjectMapper }
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
 import com.typesafe.config.{ Config, ConfigFactory }
@@ -107,6 +107,7 @@ object JacksonSupport extends JacksonSupport {
       config: Config
   ): ObjectMapper with ClassTagExtensions = {
     val builder = JsonMapper.builder(createJsonFactory(config))
+    builder.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
     import org.apache.pekko.util.ccompat.JavaConverters._
     val configuredModules = config.getStringList("jackson-modules").asScala.toSeq
     val modules           = configuredModules.map(loadModule)
@@ -115,16 +116,8 @@ object JacksonSupport extends JacksonSupport {
   }
 
   private def loadModule(fcqn: String): JacksonModule = {
-    val inst = if (fcqn == "tools.jackson.module.paramnames.ParameterNamesModule") {
-      // matches the support for this module that appears in pekko-serialization-jackson
-      Class
-        .forName(fcqn)
-        .getConstructor(classOf[JsonCreator.Mode])
-        .newInstance(JsonCreator.Mode.PROPERTIES)
-    } else {
-      Try(Class.forName(fcqn).getConstructor().newInstance())
-        .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
-    }
+    val inst = Try(Class.forName(fcqn).getConstructor().newInstance())
+      .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
     inst.asInstanceOf[JacksonModule]
   }
 }
