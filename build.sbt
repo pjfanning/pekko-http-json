@@ -107,7 +107,6 @@ lazy val `pekko-http-jackson` =
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
-        library.pekkoHttpJacksonJava,
         library.jacksonModuleScala,
         library.pekkoStream             % Provided,
         library.scalaTest               % Test,
@@ -238,7 +237,6 @@ lazy val library =
     }
     // format: off
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
-    val pekkoHttpJacksonJava = "org.apache.pekko"                      %% "pekko-http-jackson"    % Version.pekkoHttp
     val pekkoStream          = "org.apache.pekko"                      %% "pekko-stream"          % Version.pekko
     val argonaut             = "io.github.argonaut-io"                 %% "argonaut"              % Version.argonaut
     val avro4sJson           = "com.sksamuel.avro4s"                   %% "avro4s-json"           % Version.avro4s
