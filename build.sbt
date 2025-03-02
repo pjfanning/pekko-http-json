@@ -62,6 +62,7 @@ lazy val `pekko-http-json` =
       `pekko-http-avro4s`,
       `pekko-http-circe`,
       `pekko-http-jackson`,
+      `pekko-http-jackson3`,
       `pekko-http-json4s`,
       `pekko-http-jsoniter-scala`,
       `pekko-http-ninny`,
@@ -122,8 +123,8 @@ lazy val `pekko-http-jackson3` =
       libraryDependencies ++= Seq(
         library.pekkoHttp,
         library.jacksonModuleScala3,
-        library.pekkoStream              % Provided,
-        library.scalaTest                % Test
+        library.pekkoStream % Provided,
+        library.scalaTest   % Test
       )
     )
 
@@ -234,20 +235,20 @@ lazy val commonSettings =
 lazy val library =
   new {
     object Version {
-      val pekko              = "1.1.3"
-      val pekkoHttp          = "1.1.0"
-      val argonaut           = "6.3.11"
-      val avro4s             = "4.1.2"
-      val circe              = "0.14.10"
-      val jackson2           = "2.18.3"
-      val jackson3           = "3.0.0-rc1-SNAPSHOT"
-      val json4s             = "4.0.7"
-      val jsoniterScala      = "2.33.2"
-      val ninny              = "0.9.1"
-      val play               = "3.0.4"
-      val scalaTest          = "3.2.19"
-      val upickle            = "4.1.0"
-      val zioJson            = "0.7.36"
+      val pekko         = "1.1.3"
+      val pekkoHttp     = "1.1.0"
+      val argonaut      = "6.3.11"
+      val avro4s        = "4.1.2"
+      val circe         = "0.14.10"
+      val jackson2      = "2.18.3"
+      val jackson3      = "3.0.0-rc1-SNAPSHOT"
+      val json4s        = "4.0.7"
+      val jsoniterScala = "2.33.2"
+      val ninny         = "0.9.1"
+      val play          = "3.0.4"
+      val scalaTest     = "3.2.19"
+      val upickle       = "4.1.0"
+      val zioJson       = "0.7.36"
     }
     // format: off
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
@@ -258,8 +259,8 @@ lazy val library =
     val circeGeneric         = "io.circe"                              %% "circe-generic"         % Version.circe
     val circeParser          = "io.circe"                              %% "circe-parser"          % Version.circe
     val jacksonModuleScala2  = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jackson2
-    val jacksonModuleParamNames2 = "com.fasterxml.jackson.module"        % "jackson-module-parameter-names" % Version.jackson2
-    val jacksonModuleScala3  = "tools.jackson.module"                  %% "jackson-module-scala"  % Version.jackson2
+    val jacksonModuleParamNames2 = "com.fasterxml.jackson.module"       % "jackson-module-parameter-names" % Version.jackson2
+    val jacksonModuleScala3  = "tools.jackson.module"                  %% "jackson-module-scala"  % Version.jackson3
     val json4sCore           = "org.json4s"                            %% "json4s-core"           % Version.json4s
     val json4sJackson        = "org.json4s"                            %% "json4s-jackson"        % Version.json4s
     val json4sNative         = "org.json4s"                            %% "json4s-native"         % Version.json4s
