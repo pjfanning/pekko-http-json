@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
 import com.typesafe.config.{ Config, ConfigFactory }
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
-import org.apache.pekko.http.javadsl.marshallers.jackson.Jackson
 import org.apache.pekko.http.scaladsl.common.EntityStreamingSupport
 import org.apache.pekko.http.scaladsl.marshalling._
 import org.apache.pekko.http.scaladsl.model.{
