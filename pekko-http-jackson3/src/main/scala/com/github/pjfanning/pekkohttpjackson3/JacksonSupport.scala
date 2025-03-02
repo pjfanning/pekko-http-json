@@ -16,7 +16,6 @@
 
 package com.github.pjfanning.pekkohttpjackson3
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import tools.jackson.core.util.{ BufferRecycler, JsonRecyclerPools, RecyclerPool }
 import tools.jackson.core.{
   JsonParser,
