@@ -13,7 +13,6 @@
 
 package com.github.pjfanning.pekkohttpjackson3;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.typesafe.config.Config;
@@ -40,9 +39,11 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
 public class Jackson {
-    private static final ObjectMapper defaultObjectMapper =
+    private static final String CONFIG_ROOT = "pekko.http.marshallers.jackson";
 
-            createMapper().enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
+    private static final ObjectMapper defaultObjectMapper = createMapper(
+            ConfigFactory.load().getConfig(CONFIG_ROOT),
+            List.of(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
 
     /** INTERNAL API */
     public static class JacksonUnmarshallingException extends ExceptionWithErrorInfo {
@@ -98,11 +99,7 @@ public class Jackson {
         }
     }
 
-    private static ObjectMapper createMapper() {
-        return createMapper(ConfigFactory.load().getConfig("pekko.http.marshallers.jackson"));
-    }
-
-    static ObjectMapper createMapper(final Config config, List<MapperFeature> featureList) {
+    static ObjectMapper createMapper(final Config config, final List<MapperFeature> featureList) {
         StreamReadConstraints streamReadConstraints =
                 StreamReadConstraints.builder()
                         .maxNestingDepth(config.getInt("read.max-nesting-depth"))
@@ -116,15 +113,16 @@ public class Jackson {
                 StreamWriteConstraints.builder()
                         .maxNestingDepth(config.getInt("write.max-nesting-depth"))
                         .build();
-        JsonFactoryBuilder jsonFactoryBuilder =
+        final JsonFactoryBuilder jsonFactoryBuilder =
                 JsonFactory.builder()
                         .streamReadConstraints(streamReadConstraints)
                         .streamWriteConstraints(streamWriteConstraints)
                         .recyclerPool(getBufferRecyclerPool(config));
+        final JsonMapper.Builder builder = JsonMapper.builder(jsonFactoryBuilder.build());
         for (MapperFeature feature : featureList) {
-            jsonFactoryBuilder = jsonFactoryBuilder.enable(feature);
+            builder.enable(feature);
         }
-        return new JsonMapper(jsonFactoryBuilder.build());
+        return builder.build();
     }
 
     private static RecyclerPool<BufferRecycler> getBufferRecyclerPool(final Config cfg) {
@@ -144,4 +142,6 @@ public class Jackson {
                 throw new IllegalArgumentException("Unknown recycler-pool: " + poolType);
         }
     }
+
+    private Jackson() {}
 }

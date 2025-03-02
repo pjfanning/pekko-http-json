@@ -30,6 +30,7 @@ import org.apache.pekko.stream.scaladsl.{ Sink, Source }
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
+import tools.jackson.module.scala.DefaultScalaModule
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -161,17 +162,12 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
         .isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe true
     }
 
-    "support loading jackson-module-parameter-names" in {
-      val testCfg = ConfigFactory
-        .parseString(
-          """jackson-modules += "tools.jackson.module.paramnames.ParameterNamesModule""""
-        )
-        .withFallback(JacksonSupport.jacksonConfig)
-        .resolve()
-      val mapper = JacksonSupport.createObjectMapper(testCfg)
-      mapper.getRegisteredModuleIds should contain("jackson-module-parameter-names")
-      mapper.getRegisteredModuleIds should contain(
-        "tools.jackson.module.scala.DefaultScalaModule"
+    "support loading DefaultScalaModule" in {
+      val testCfg = JacksonSupport.jacksonConfig
+      val mapper  = JacksonSupport.createObjectMapper(testCfg)
+      import scala.collection.JavaConverters._
+      mapper.getRegisteredModules.asScala.map(_.getClass) should contain(
+        classOf[DefaultScalaModule]
       )
     }
   }

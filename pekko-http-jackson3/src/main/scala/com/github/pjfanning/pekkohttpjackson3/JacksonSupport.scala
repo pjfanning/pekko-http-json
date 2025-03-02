@@ -16,23 +16,22 @@
 
 package com.github.pjfanning.pekkohttpjackson3
 
-import tools.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonCreator
 import tools.jackson.core.util.{ BufferRecycler, JsonRecyclerPools, RecyclerPool }
 import tools.jackson.core.{
-  JsonFactory,
-  JsonFactoryBuilder,
   JsonParser,
+  ObjectReadContext,
   StreamReadConstraints,
   StreamReadFeature,
   StreamWriteConstraints
 }
+import tools.jackson.core.json.{ JsonFactory, JsonFactoryBuilder }
 import tools.jackson.core.async.ByteBufferFeeder
-import tools.jackson.databind.{ Module, ObjectMapper }
+import tools.jackson.databind.{ JacksonModule, ObjectMapper }
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
 import com.typesafe.config.{ Config, ConfigFactory }
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
-import org.apache.pekko.http.javadsl.marshallers.jackson.Jackson
 import org.apache.pekko.http.scaladsl.common.EntityStreamingSupport
 import org.apache.pekko.http.scaladsl.marshalling._
 import org.apache.pekko.http.scaladsl.model.{
@@ -61,10 +60,10 @@ import scala.util.control.NonFatal
   */
 object JacksonSupport extends JacksonSupport {
 
-  private[pekkohttpjackson] val jacksonConfig =
+  private[pekkohttpjackson3] val jacksonConfig =
     ConfigFactory.load().getConfig("pekko-http-json.jackson")
 
-  private[pekkohttpjackson] def createJsonFactory(config: Config): JsonFactory = {
+  private[pekkohttpjackson3] def createJsonFactory(config: Config): JsonFactory = {
     val streamReadConstraints = StreamReadConstraints
       .builder()
       .maxNestingDepth(config.getInt("read.max-nesting-depth"))
@@ -94,8 +93,6 @@ object JacksonSupport extends JacksonSupport {
   private def getBufferRecyclerPool(cfg: Config): RecyclerPool[BufferRecycler] =
     cfg.getString("buffer-recycler.pool-instance") match {
       case "thread-local"            => JsonRecyclerPools.threadLocalPool()
-      case "lock-free"               => JsonRecyclerPools.newLockFreePool()
-      case "shared-lock-free"        => JsonRecyclerPools.sharedLockFreePool()
       case "concurrent-deque"        => JsonRecyclerPools.newConcurrentDequePool()
       case "shared-concurrent-deque" => JsonRecyclerPools.sharedConcurrentDequePool()
       case "bounded" =>
@@ -106,7 +103,7 @@ object JacksonSupport extends JacksonSupport {
 
   val defaultObjectMapper: ObjectMapper with ClassTagExtensions = createObjectMapper(jacksonConfig)
 
-  private[pekkohttpjackson] def createObjectMapper(
+  private[pekkohttpjackson3] def createObjectMapper(
       config: Config
   ): ObjectMapper with ClassTagExtensions = {
     val builder = JsonMapper.builder(createJsonFactory(config))
@@ -117,7 +114,7 @@ object JacksonSupport extends JacksonSupport {
     builder.build() :: ClassTagExtensions
   }
 
-  private def loadModule(fcqn: String): Module = {
+  private def loadModule(fcqn: String): JacksonModule = {
     val inst = if (fcqn == "tools.jackson.module.paramnames.ParameterNamesModule") {
       // matches the support for this module that appears in pekko-serialization-jackson
       Class
@@ -128,7 +125,7 @@ object JacksonSupport extends JacksonSupport {
       Try(Class.forName(fcqn).getConstructor().newInstance())
         .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
     }
-    inst.asInstanceOf[Module]
+    inst.asInstanceOf[JacksonModule]
   }
 }
 
@@ -211,8 +208,9 @@ trait JacksonSupport {
   ): Unmarshaller[ByteString, A] =
     Unmarshaller { ec => bs =>
       Future {
-        val parser = objectMapper.getFactory
-          .createNonBlockingByteBufferParser()
+        val parser = objectMapper
+          .tokenStreamFactory()
+          .createNonBlockingByteBufferParser(ObjectReadContext.empty())
           .asInstanceOf[JsonParser with ByteBufferFeeder]
         try {
           bs match {
