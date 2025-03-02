@@ -19,6 +19,7 @@ package com.github.pjfanning.pekkohttpjackson3
 import tools.jackson.core.StreamReadFeature
 import tools.jackson.core.util.JsonRecyclerPools.BoundedPool
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.ConfigFactory
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.marshalling.Marshal
@@ -30,7 +31,6 @@ import org.apache.pekko.stream.scaladsl.{ Sink, Source }
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
-import tools.jackson.module.scala.DefaultScalaModule
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
