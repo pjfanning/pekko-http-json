@@ -39,7 +39,6 @@ inThisBuild(
       "-Ywarn-unused:imports",
       "-target:jvm-1.8"
     ),
-    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
     scalafmtOnCompile := true,
     dynverSeparator   := "_" // the default `+` is not compatible with docker tags
   )
@@ -241,7 +240,7 @@ lazy val library =
       val avro4s        = "4.1.2"
       val circe         = "0.14.10"
       val jackson2      = "2.18.3"
-      val jackson3      = "3.0.0-rc1-SNAPSHOT"
+      val jackson3      = "3.0.0-rc1"
       val json4s        = "4.0.7"
       val jsoniterScala = "2.33.2"
       val ninny         = "0.9.1"
