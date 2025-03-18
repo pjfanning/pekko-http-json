@@ -93,7 +93,7 @@ lazy val `pekko-http-argonaut` =
 lazy val `pekko-http-circe` =
   project
     .settings(commonSettings, withScala3)
-    .dependsOn(`pekko-http-circe-base`)
+    .dependsOn(`pekko-http-circe-base` % "compile-internal->compile-internal;test-internal->test-internal")
     .settings(
       // We don't want to publish pekko-http-circe-base, but want to have its classes available for users of
       // pekko-http-circe.
@@ -177,7 +177,7 @@ lazy val `pekko-http-jsoniter-scala` =
 lazy val `pekko-http-jsoniter-scala-circe` =
   project
     .settings(commonSettings, withScala3)
-    .dependsOn(`pekko-http-circe-base`)
+    .dependsOn(`pekko-http-circe-base` % "compile-internal->compile-internal;test-internal->test-internal")
     .settings(
       // We don't want to publish pekko-http-circe-base, but want to have its classes available for users of
       // pekko-http-jsoniter-scala-circe.
