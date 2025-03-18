@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.pjfanning.pekkohttpcirce
+package com.github.pjfanning.pekkohttpjsoniterscalacirce
 
 import org.apache.pekko.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
 import org.apache.pekko.util.ByteString
@@ -23,10 +23,12 @@ import com.github.pjfanning.pekkohttpcircebase.{
   ErrorAccumulatingSupport,
   FailFastSupport
 }
-import io.circe.{ Json, jawn }
-import io.circe.parser.parse
+import com.github.plokhotnyuk.jsoniter_scala.circe.JsoniterScalaCodec._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+import io.circe.{ Json, ParsingFailure }
 
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 /**
   * Automatic to and from JSON marshalling/unmarshalling using an in-scope circe protocol. The
@@ -69,23 +71,24 @@ trait BaseCirceSupport extends BaseSupport {
       .forContentTypes(unmarshallerContentTypes: _*)
       .map {
         case ByteString.empty => throw Unmarshaller.NoContentException
-        case data             => jawn.parseByteBuffer(data.asByteBuffer).fold(throw _, identity)
+        case data             => readFromByteBuffer[Json](data.asByteBuffer)
       }
 
   override implicit final val safeJsonUnmarshaller
-      : FromEntityUnmarshaller[Either[io.circe.ParsingFailure, Json]] =
+      : FromEntityUnmarshaller[Either[ParsingFailure, Json]] =
     Unmarshaller.stringUnmarshaller
       .forContentTypes(unmarshallerContentTypes: _*)
-      .map(parse)
+      .map(s =>
+        try
+          Right(readFromString[Json](s))
+        catch {
+          case NonFatal(e) => Left(new ParsingFailure(e.getMessage(), e))
+        }
+      )
 
   override def byteStringJsonUnmarshaller: Unmarshaller[ByteString, Json] =
     Unmarshaller { ec => bs =>
-      Future {
-        jawn.parseByteBuffer(bs.asByteBuffer) match {
-          case Right(json) => json
-          case Left(pf)    => throw pf
-        }
-      }(ec)
+      Future(readFromByteBuffer[Json](bs.asByteBuffer))(ec)
     }
 }
 

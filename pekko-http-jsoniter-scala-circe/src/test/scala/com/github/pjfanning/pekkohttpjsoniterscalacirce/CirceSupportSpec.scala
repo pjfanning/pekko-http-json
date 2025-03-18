@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.pjfanning.pekkohttpcirce
+package com.github.pjfanning.pekkohttpjsoniterscalacirce
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.marshalling.Marshal

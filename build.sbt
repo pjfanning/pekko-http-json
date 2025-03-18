@@ -60,10 +60,12 @@ lazy val `pekko-http-json` =
       `pekko-http-argonaut`,
       `pekko-http-avro4s`,
       `pekko-http-circe`,
+      `pekko-http-circe-base`,
       `pekko-http-jackson`,
       `pekko-http-jackson3`,
       `pekko-http-json4s`,
       `pekko-http-jsoniter-scala`,
+      `pekko-http-jsoniter-scala-circe`,
       `pekko-http-ninny`,
       `pekko-http-play-json`,
       `pekko-http-upickle`,
@@ -91,6 +93,12 @@ lazy val `pekko-http-argonaut` =
 lazy val `pekko-http-circe` =
   project
     .settings(commonSettings, withScala3)
+    .dependsOn(`pekko-http-circe-base`)
+    .settings(
+      // We don't want to publish pekko-http-circe-base, but want to have its classes available for users of
+      // pekko-http-circe.
+      Compile / packageBin / mappings ++= (`pekko-http-circe-base` / Compile / packageBin / mappings).value
+    )
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -99,6 +107,18 @@ lazy val `pekko-http-circe` =
         library.pekkoStream  % Provided,
         library.circeGeneric % Test,
         library.scalaTest    % Test,
+      )
+    )
+
+lazy val `pekko-http-circe-base` =
+  project
+    .settings(commonSettings, withScala3)
+    .settings(publishArtifact := false)
+    .settings(
+      libraryDependencies ++= Seq(
+        library.pekkoHttp,
+        library.circe,
+        library.pekkoStream % Provided
       )
     )
 
@@ -151,6 +171,27 @@ lazy val `pekko-http-jsoniter-scala` =
         library.pekkoStream         % Provided,
         library.jsoniterScalaMacros % Test,
         library.scalaTest           % Test,
+      )
+    )
+
+lazy val `pekko-http-jsoniter-scala-circe` =
+  project
+    .settings(commonSettings, withScala3)
+    .dependsOn(`pekko-http-circe-base`)
+    .settings(
+      // We don't want to publish pekko-http-circe-base, but want to have its classes available for users of
+      // pekko-http-jsoniter-scala-circe.
+      Compile / packageBin / mappings ++= (`pekko-http-circe-base` / Compile / packageBin / mappings).value
+    )
+    .settings(
+      libraryDependencies ++= Seq(
+        library.pekkoHttp,
+        library.circe,
+        library.jsoniterScalaCore,
+        library.jsoniterScalaCirce,
+        library.pekkoStream  % Provided,
+        library.circeGeneric % Test,
+        library.scalaTest    % Test,
       )
     )
 
@@ -263,6 +304,7 @@ lazy val library =
     val json4sCore           = "org.json4s"                            %% "json4s-core"           % Version.json4s
     val json4sJackson        = "org.json4s"                            %% "json4s-jackson"        % Version.json4s
     val json4sNative         = "org.json4s"                            %% "json4s-native"         % Version.json4s
+    val jsoniterScalaCirce   = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-circe"  % Version.jsoniterScala
     val jsoniterScalaCore    = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % Version.jsoniterScala
     val jsoniterScalaMacros  = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % Version.jsoniterScala
     val ninny                = "tk.nrktkt"                             %% "ninny"                 % Version.ninny
