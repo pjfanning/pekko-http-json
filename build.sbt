@@ -95,6 +95,8 @@ lazy val `pekko-http-circe` =
     .settings(commonSettings, withScala3)
     .dependsOn(`pekko-http-circe-base`)
     .settings(
+      // We don't want to publish pekko-http-circe-base, but want to have its classes available for users of
+      // pekko-http-circe.
       Compile / packageBin / mappings ++= (`pekko-http-circe-base` / Compile / packageBin / mappings).value
     )
     .settings(
@@ -177,6 +179,8 @@ lazy val `pekko-http-jsoniter-scala-circe` =
     .settings(commonSettings, withScala3)
     .dependsOn(`pekko-http-circe-base`)
     .settings(
+      // We don't want to publish pekko-http-circe-base, but want to have its classes available for users of
+      // pekko-http-jsoniter-scala-circe.
       Compile / packageBin / mappings ++= (`pekko-http-circe-base` / Compile / packageBin / mappings).value
     )
     .settings(
