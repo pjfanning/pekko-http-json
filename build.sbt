@@ -60,6 +60,7 @@ lazy val `pekko-http-json` =
       `pekko-http-argonaut`,
       `pekko-http-avro4s`,
       `pekko-http-circe`,
+      `pekko-http-circe-base`,
       `pekko-http-jackson`,
       `pekko-http-jackson3`,
       `pekko-http-json4s`,
@@ -90,6 +91,7 @@ lazy val `pekko-http-argonaut` =
 
 lazy val `pekko-http-circe` =
   project
+    .dependsOn(`pekko-http-circe-base`)
     .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
@@ -101,6 +103,18 @@ lazy val `pekko-http-circe` =
         library.scalaTest    % Test,
       )
     )
+
+lazy val `pekko-http-circe-base` =
+  project
+    .settings(commonSettings, withScala3)
+    .settings(
+      libraryDependencies ++= Seq(
+        library.pekkoHttp,
+        library.circe,
+        library.pekkoStream % Provided
+      )
+    )
+    .settings(publishArtifact := false)
 
 lazy val `pekko-http-jackson` =
   project

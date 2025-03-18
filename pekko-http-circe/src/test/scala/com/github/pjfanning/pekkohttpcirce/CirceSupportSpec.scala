@@ -22,6 +22,7 @@ import org.apache.pekko.http.scaladsl.model.ContentTypes.{ `application/json`, `
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
 import org.apache.pekko.http.scaladsl.unmarshalling.{ Unmarshal, Unmarshaller }
+import com.github.pjfanning.pekkohttpcircebase.ErrorAccumulatingSupport
 import cats.data.{ NonEmptyList, ValidatedNel }
 import cats.implicits.toShow
 import io.circe.CursorOp.DownField
@@ -189,7 +190,7 @@ final class CirceSupportSpec
           DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a"))),
           DecodingFailure("Got value '2' with wrong type, expecting string", List(DownField("b")))
         )
-      val errorMessage = ErrorAccumulatingCirceSupport.DecodingFailures(errors).getMessage
+      val errorMessage = ErrorAccumulatingSupport.DecodingFailures(errors).getMessage
       Unmarshal(entity)
         .to[MultiFoo]
         .failed
@@ -203,7 +204,7 @@ final class CirceSupportSpec
           DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a"))),
           DecodingFailure("Got value '2' with wrong type, expecting string", List(DownField("b")))
         )
-      val errorMessage = ErrorAccumulatingCirceSupport.DecodingFailures(errors).getMessage
+      val errorMessage = ErrorAccumulatingSupport.DecodingFailures(errors).getMessage
       val result: String = Unmarshal(entity)
         .to[ValidatedNel[io.circe.Error, MultiFoo]]
         .futureValue
