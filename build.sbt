@@ -92,8 +92,11 @@ lazy val `pekko-http-argonaut` =
 
 lazy val `pekko-http-circe` =
   project
-    .dependsOn(`pekko-http-circe-base`)
     .settings(commonSettings, withScala3)
+    .dependsOn(`pekko-http-circe-base`)
+    .settings(
+      Compile / packageBin / mappings ++= (`pekko-http-circe-base` / Compile / packageBin / mappings).value
+    )
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -108,6 +111,7 @@ lazy val `pekko-http-circe` =
 lazy val `pekko-http-circe-base` =
   project
     .settings(commonSettings, withScala3)
+    .settings(publishArtifact := false)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -115,7 +119,6 @@ lazy val `pekko-http-circe-base` =
         library.pekkoStream % Provided
       )
     )
-    .settings(publishArtifact := false)
 
 lazy val `pekko-http-jackson` =
   project
@@ -171,8 +174,11 @@ lazy val `pekko-http-jsoniter-scala` =
 
 lazy val `pekko-http-jsoniter-scala-circe` =
   project
-    .dependsOn(`pekko-http-circe-base`)
     .settings(commonSettings, withScala3)
+    .dependsOn(`pekko-http-circe-base`)
+    .settings(
+      Compile / packageBin / mappings ++= (`pekko-http-circe-base` / Compile / packageBin / mappings).value
+    )
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
