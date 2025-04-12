@@ -292,7 +292,7 @@ lazy val library =
       val play          = "3.0.4"
       val scalaTest     = "3.2.19"
       val upickle       = "4.1.0"
-      val zioJson       = "0.7.36"
+      val zioJson       = "0.7.42"
     }
     // format: off
     val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
