@@ -55,7 +55,7 @@ trait AvroSupport {
   type SourceOf[A] = Source[A, _]
 
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
-  private val defaultContentTypes: Seq[ContentTypeRange] =
+  private val defaultContentTypes: Seq[ContentTypeRange]         =
     defaultMediaTypes.map(ContentTypeRange.apply)
   private val byteArrayUnmarshaller: FromEntityUnmarshaller[Array[Byte]] =
     Unmarshaller.byteArrayUnmarshaller.forContentTypes(unmarshallerContentTypes: _*)

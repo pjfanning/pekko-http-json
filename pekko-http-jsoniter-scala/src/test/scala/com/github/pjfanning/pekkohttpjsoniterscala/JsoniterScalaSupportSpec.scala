@@ -91,7 +91,7 @@ final class JsoniterScalaSupportSpec extends AsyncWordSpec with Matchers with Be
     }
 
     "allow unmarshalling with passed in Content-Types" in {
-      val foo = Foo("bar")
+      val foo                     = Foo("bar")
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
