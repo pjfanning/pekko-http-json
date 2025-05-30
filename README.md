@@ -44,7 +44,7 @@ libraryDependencies ++= Seq(
 
 ### Snapshots
 
-Check https://central.sonatype.com/repository/maven-snapshots/com/github/pjfanning/ to find the version numbers for the latest pekko-http-json snapshots.
+Check https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/github/pjfanning/ to find the version numbers for the latest pekko-http-json snapshots.
 
 ``` scala
 resolvers += "Sonatype Central Snapshots" at "https://central.sonatype.com/repository/maven-snapshots/"
