@@ -133,7 +133,7 @@ final class CirceSupportSpec
 
     "fail-fast and return only the first unmarshalling error" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
-      val error =
+      val error  =
         DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a")))
       Unmarshal(entity)
         .to[MultiFoo]
@@ -142,7 +142,7 @@ final class CirceSupportSpec
     }
 
     "fail-fast and return only the first unmarshalling error with safeUnmarshaller" in {
-      val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
+      val entity                = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
       val error: io.circe.Error =
         DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a")))
       Unmarshal(entity)
@@ -204,7 +204,7 @@ final class CirceSupportSpec
           DecodingFailure("Got value '1' with wrong type, expecting string", List(DownField("a"))),
           DecodingFailure("Got value '2' with wrong type, expecting string", List(DownField("b")))
         )
-      val errorMessage = ErrorAccumulatingSupport.DecodingFailures(errors).getMessage
+      val errorMessage   = ErrorAccumulatingSupport.DecodingFailures(errors).getMessage
       val result: String = Unmarshal(entity)
         .to[ValidatedNel[io.circe.Error, MultiFoo]]
         .futureValue

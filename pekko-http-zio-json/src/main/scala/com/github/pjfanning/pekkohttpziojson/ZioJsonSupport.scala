@@ -137,7 +137,7 @@ trait ZioJsonSupport {
       .flatMap { implicit ec => implicit m =>
         {
           case ByteString.empty => throw Unmarshaller.NoContentException
-          case data =>
+          case data             =>
             val marshaller = fromByteStringUnmarshaller
             marshaller(data)
         }

@@ -83,7 +83,7 @@ final class Json4sSupportSpec extends AsyncWordSpec with Matchers with BeforeAnd
 
     "provide proper error messages for requirement errors" in {
       implicit val serialization: native.Serialization.type = native.Serialization
-      val entity =
+      val entity                                            =
         HttpEntity(MediaTypes.`application/json`, """{ "bar": "baz" }""")
       Unmarshal(entity)
         .to[Foo]
@@ -114,7 +114,7 @@ final class Json4sSupportSpec extends AsyncWordSpec with Matchers with BeforeAnd
     "allow unmarshalling with passed in Content-Types" in {
       implicit val serialization: native.Serialization.type = native.Serialization
       val foo                                               = Foo("bar")
-      val `application/json-home` =
+      val `application/json-home`                           =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
       final object CustomJson4sSupport extends Json4sSupport {

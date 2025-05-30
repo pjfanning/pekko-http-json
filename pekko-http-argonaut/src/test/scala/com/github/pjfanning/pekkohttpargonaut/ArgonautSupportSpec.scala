@@ -43,7 +43,7 @@ final class ArgonautSupportSpec extends AsyncWordSpec with Matchers with BeforeA
 
   import ArgonautSupportSpec._
 
-  private implicit val system: ActorSystem = ActorSystem()
+  private implicit val system: ActorSystem      = ActorSystem()
   private implicit def fooCodec: CodecJson[Foo] =
     casecodec1(Foo.apply, (f: Foo) => Option(f.bar))("bar")
 
@@ -103,7 +103,7 @@ final class ArgonautSupportSpec extends AsyncWordSpec with Matchers with BeforeA
     }
 
     "allow unmarshalling with passed in Content-Types" in {
-      val foo = Foo("bar")
+      val foo                     = Foo("bar")
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
