@@ -40,11 +40,6 @@ inThisBuild(
       "-target:jvm-1.8"
     ),
     scalafmtOnCompile := true,
-    publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value) Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      else localStaging.value
-    },
     dynverSeparator   := "_" // the default `+` is not compatible with docker tags
   )
 )
