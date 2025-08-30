@@ -52,9 +52,9 @@ object Json4sSupport extends Json4sSupport {
 
   sealed abstract class ShouldWritePretty
 
-  final object ShouldWritePretty {
-    final object True  extends ShouldWritePretty
-    final object False extends ShouldWritePretty
+  object ShouldWritePretty {
+    object True  extends ShouldWritePretty
+    object False extends ShouldWritePretty
   }
 }
 

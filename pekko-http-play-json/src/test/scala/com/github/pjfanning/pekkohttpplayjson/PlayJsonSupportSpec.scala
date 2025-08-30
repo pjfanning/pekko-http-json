@@ -112,7 +112,7 @@ final class PlayJsonSupportSpec extends AsyncWordSpec with Matchers with BeforeA
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
-      final object CustomPlayJsonSupport extends PlayJsonSupport {
+      object CustomPlayJsonSupport extends PlayJsonSupport {
         override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
       }
       import CustomPlayJsonSupport._

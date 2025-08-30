@@ -156,7 +156,7 @@ final class CirceSupportSpec
     "allow unmarshalling with passed in Content-Types" in {
       val foo = Foo("bar")
 
-      final object CustomCirceSupport extends FailFastCirceSupport {
+      object CustomCirceSupport extends FailFastCirceSupport {
         override def unmarshallerContentTypes: List[ContentTypeRange] =
           List(`application/json`, `application/json-home`)
       }
@@ -222,7 +222,7 @@ final class CirceSupportSpec
     "allow unmarshalling with passed in Content-Types" in {
       val foo = Foo("bar")
 
-      final object CustomCirceSupport extends ErrorAccumulatingCirceSupport {
+      object CustomCirceSupport extends ErrorAccumulatingCirceSupport {
         override def unmarshallerContentTypes: List[ContentTypeRange] =
           List(`application/json`, `application/json-home`)
       }

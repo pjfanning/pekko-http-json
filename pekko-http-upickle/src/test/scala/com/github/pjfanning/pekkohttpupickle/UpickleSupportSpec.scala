@@ -33,7 +33,7 @@ import org.scalatest.wordspec.AsyncWordSpec
 
 object UpickleSupportSpec {
 
-  final object Foo {
+  object Foo {
     implicit val rw: ReadWriter[Foo] = macroRW
   }
 
@@ -98,7 +98,7 @@ final class UpickleSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
-      final object CustomUpickleSupport extends UpickleSupport {
+      object CustomUpickleSupport extends UpickleSupport {
         override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
       }
       import CustomUpickleSupport._

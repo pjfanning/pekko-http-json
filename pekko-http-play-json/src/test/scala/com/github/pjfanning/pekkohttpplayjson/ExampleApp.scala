@@ -29,7 +29,7 @@ import scala.io.StdIn
 
 object ExampleApp {
 
-  final object Foo {
+  object Foo {
     implicit val fooFormat: Format[Foo] = Json.format[Foo]
   }
   final case class Foo(bar: String)

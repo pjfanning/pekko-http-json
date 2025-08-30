@@ -106,7 +106,7 @@ final class AvroSupportSpec extends AsyncWordSpec with Matchers with BeforeAndAf
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
-      final object CustomAvroSupport extends AvroSupport {
+      object CustomAvroSupport extends AvroSupport {
         override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
       }
       import CustomAvroSupport._

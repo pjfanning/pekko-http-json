@@ -106,7 +106,7 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
-      final object CustomJacksonSupport extends JacksonSupport {
+      object CustomJacksonSupport extends JacksonSupport {
         override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
       }
       import CustomJacksonSupport._

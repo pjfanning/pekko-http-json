@@ -30,7 +30,7 @@ import scala.io.StdIn
 
 object ExampleApp {
 
-  final object Foo {
+  object Foo {
     implicit val schemaFor  = SchemaFor[Foo]
     implicit val toRecord   = ToRecord[Foo]
     implicit val fromRecord = FromRecord[Foo]

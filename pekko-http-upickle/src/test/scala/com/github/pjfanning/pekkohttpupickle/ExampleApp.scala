@@ -29,7 +29,7 @@ import upickle.default.{ ReadWriter, macroRW }
 
 object ExampleApp {
 
-  final object Foo {
+  object Foo {
     implicit val rw: ReadWriter[Foo] = macroRW
   }
 

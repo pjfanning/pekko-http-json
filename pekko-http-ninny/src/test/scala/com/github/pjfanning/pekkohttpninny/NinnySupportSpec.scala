@@ -109,7 +109,7 @@ final class NinnySupportSpec extends AsyncWordSpec with Matchers with BeforeAndA
       val `application/json-home` =
         MediaType.applicationWithFixedCharset("json-home", HttpCharsets.`UTF-8`, "json-home")
 
-      final object CustomNinnySupport extends NinnySupport {
+      object CustomNinnySupport extends NinnySupport {
         override def unmarshallerContentTypes = List(`application/json`, `application/json-home`)
       }
       import CustomNinnySupport._
