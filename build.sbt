@@ -33,7 +33,6 @@ inThisBuild(
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
-      "-language:_",
       "-encoding",
       "UTF-8",
       "-Ywarn-unused:imports",
