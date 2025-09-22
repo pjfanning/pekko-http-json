@@ -166,7 +166,7 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
       val testCfg = JacksonSupport.jacksonConfig
       val mapper  = JacksonSupport.createObjectMapper(testCfg)
       import org.apache.pekko.util.ccompat.JavaConverters._
-      mapper.getRegisteredModules.asScala.map(_.getClass) should contain(
+      mapper.registeredModules.asScala.map(_.getClass) should contain(
         classOf[DefaultScalaModule]
       )
     }
