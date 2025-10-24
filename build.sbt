@@ -49,7 +49,8 @@ val withScala3 = Seq(
 
 val targetJava8 = Seq(
   javacOptions ++= Seq(
-    "--release", "8"
+    "--release",
+    "8"
   ),
   scalacOptions ++= Seq(
     "-release:8"
@@ -58,7 +59,8 @@ val targetJava8 = Seq(
 
 val targetJava17 = Seq(
   javacOptions ++= Seq(
-    "--release", "17"
+    "--release",
+    "17"
   ),
   scalacOptions ++= Seq(
     "-release:17"
@@ -302,7 +304,7 @@ lazy val library =
       val avro4s        = "4.1.2"
       val circe         = "0.14.15"
       val jackson2      = "2.20.0"
-      val jackson3      = "3.0.0"
+      val jackson3      = "3.0.1"
       val json4s        = "4.0.7"
       val jsoniterScala = "2.38.3"
       val ninny         = "0.9.1"
