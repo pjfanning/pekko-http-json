@@ -28,8 +28,8 @@ inThisBuild(
         url("https://github.com/pjfanning")
       ),
     ),
-    scalaVersion       := "2.13.17",
-    crossScalaVersions := Seq("2.13.17", "2.12.20"),
+    scalaVersion       := "2.13.18",
+    crossScalaVersions := Seq("2.13.18", "2.12.20"),
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
