@@ -39,9 +39,11 @@ object ExampleApp {
     //
     // for example:
     //
-    // implicit val objectMapper = new ObjectMapper()
-    //   .registerModule(DefaultScalaModule)
-    //   .registerModule(new GuavaModule())
+    // implicit val objectMapper: ObjectMapper with ClassTagExtensions =
+    //   JsonMapper.builder()
+    //     .addModule(DefaultScalaModule)
+    //     .addModule(new GuavaModule()) // if you need Guava support
+    //     .build() :: ClassTagExtensions
 
     Http().newServerAt("127.0.0.1", 8000).bindFlow(route)
 
