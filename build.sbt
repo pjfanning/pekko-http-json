@@ -29,7 +29,7 @@ inThisBuild(
       ),
     ),
     scalaVersion       := "2.13.18",
-    crossScalaVersions := Seq("2.13.18", "2.12.20"),
+    crossScalaVersions := Seq("2.13.18", "2.12.21"),
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
