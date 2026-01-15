@@ -107,7 +107,7 @@ object JacksonSupport extends JacksonSupport {
   ): ObjectMapper with ClassTagExtensions = {
     val builder = JsonMapper.builder(createJsonFactory(config))
     builder.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-    import org.apache.pekko.util.ccompat.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val configuredModules = config.getStringList("jackson-modules").asScala.toSeq
     val modules           = configuredModules.map(loadModule)
     modules.foreach(builder.addModule)

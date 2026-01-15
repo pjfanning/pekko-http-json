@@ -109,7 +109,7 @@ object JacksonSupport extends JacksonSupport {
       config: Config
   ): ObjectMapper with ClassTagExtensions = {
     val builder = JsonMapper.builder(createJsonFactory(config))
-    import org.apache.pekko.util.ccompat.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val configuredModules = config.getStringList("jackson-modules").asScala.toSeq
     val modules           = configuredModules.map(loadModule)
     modules.foreach(builder.addModule)
