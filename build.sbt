@@ -269,7 +269,6 @@ lazy val commonSettings =
       val _ = (Compile / scalafmtSbt).value
       (Compile / scalafmt).value
     },
-    resolvers += Resolver.ApacheMavenStagingRepo,
     javacOptions ++= Seq(
       "--release",
       "17"
