@@ -29,7 +29,7 @@ inThisBuild(
       ),
     ),
     scalaVersion       := "2.13.18",
-    crossScalaVersions := Seq("2.13.18", "2.12.21"),
+    crossScalaVersions := Seq("2.13.18"),
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -45,26 +45,6 @@ inThisBuild(
 
 val withScala3 = Seq(
   crossScalaVersions += "3.3.7",
-)
-
-val targetJava8 = Seq(
-  javacOptions ++= Seq(
-    "--release",
-    "8"
-  ),
-  scalacOptions ++= Seq(
-    "-release:8"
-  )
-)
-
-val targetJava17 = Seq(
-  javacOptions ++= Seq(
-    "--release",
-    "17"
-  ),
-  scalacOptions ++= Seq(
-    "-release:17"
-  )
 )
 
 // *****************************************************************************
@@ -99,7 +79,7 @@ lazy val `pekko-http-json` =
 
 lazy val `pekko-http-argonaut` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -111,7 +91,7 @@ lazy val `pekko-http-argonaut` =
 
 lazy val `pekko-http-circe` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .dependsOn(
       `pekko-http-circe-base` % "compile-internal->compile-internal;test-internal->test-internal"
     )
@@ -133,7 +113,7 @@ lazy val `pekko-http-circe` =
 
 lazy val `pekko-http-circe-base` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(publishArtifact := false)
     .settings(
       libraryDependencies ++= Seq(
@@ -145,7 +125,7 @@ lazy val `pekko-http-circe-base` =
 
 lazy val `pekko-http-jackson` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -158,7 +138,7 @@ lazy val `pekko-http-jackson` =
 
 lazy val `pekko-http-jackson3` =
   project
-    .settings(commonSettings, targetJava17, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -170,7 +150,7 @@ lazy val `pekko-http-jackson3` =
 
 lazy val `pekko-http-json4s` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -184,7 +164,7 @@ lazy val `pekko-http-json4s` =
 
 lazy val `pekko-http-jsoniter-scala` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -197,7 +177,7 @@ lazy val `pekko-http-jsoniter-scala` =
 
 lazy val `pekko-http-jsoniter-scala-circe` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .dependsOn(
       `pekko-http-circe-base` % "compile-internal->compile-internal;test-internal->test-internal"
     )
@@ -220,7 +200,7 @@ lazy val `pekko-http-jsoniter-scala-circe` =
 
 lazy val `pekko-http-ninny` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -232,7 +212,7 @@ lazy val `pekko-http-ninny` =
 
 lazy val `pekko-http-play-json` =
   project
-    .settings(commonSettings, targetJava17, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -244,7 +224,7 @@ lazy val `pekko-http-play-json` =
 
 lazy val `pekko-http-upickle` =
   project
-    .settings(commonSettings, targetJava8, withScala3)
+    .settings(commonSettings, withScala3)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -256,7 +236,7 @@ lazy val `pekko-http-upickle` =
 
 lazy val `pekko-http-avro4s` =
   project
-    .settings(commonSettings, targetJava8)
+    .settings(commonSettings)
     .settings(
       libraryDependencies ++= Seq(
         library.pekkoHttp,
@@ -288,7 +268,14 @@ lazy val commonSettings =
     Compile / scalafmt := {
       val _ = (Compile / scalafmtSbt).value
       (Compile / scalafmt).value
-    }
+    },
+    javacOptions ++= Seq(
+      "--release",
+      "17"
+    ),
+    scalacOptions ++= Seq(
+      "-release:17"
+    )
   )
 
 // *****************************************************************************
@@ -298,8 +285,8 @@ lazy val commonSettings =
 lazy val library =
   new {
     object Version {
-      val pekko         = "1.4.0"
-      val pekkoHttp     = "1.3.0"
+      val pekko         = "2.0.0-M1"
+      val pekkoHttp     = "2.0.0-M1"
       val argonaut      = "6.3.11"
       val avro4s        = "4.1.2"
       val circe         = "0.14.15"
