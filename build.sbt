@@ -300,7 +300,7 @@ lazy val library =
     object Version {
       val pekko         = "1.6.0"
       val pekkoHttp     = "1.3.0"
-      val argonaut      = "6.3.11"
+      val argonaut      = "6.3.12"
       val avro4s        = "4.1.2"
       val circe         = "0.14.15"
       val jackson2      = "2.21.2"
