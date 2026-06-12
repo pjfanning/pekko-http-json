@@ -44,7 +44,7 @@ inThisBuild(
 )
 
 val withScala3 = Seq(
-  crossScalaVersions += "3.3.7",
+  crossScalaVersions += "3.3.8",
 )
 
 // *****************************************************************************
