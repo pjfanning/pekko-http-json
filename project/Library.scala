@@ -11,7 +11,7 @@ object Library {
     val jackson2      = "2.22.1"
     val jackson3      = "3.2.1"
     val json4s        = "4.1.1"
-    val jsoniterScala = "2.38.17"
+    val jsoniterScala = "2.39.1"
     val ninny         = "0.9.4"
     val play          = "3.0.6"
     val scalaTest     = "3.2.20"
