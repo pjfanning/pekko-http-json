@@ -3,7 +3,7 @@ import sbt.*
 
 object Library {
   object Version {
-    val pekko         = "2.0.0-M3"
+    val pekko         = "2.0.0-M4"
     val pekkoHttp     = "2.0.0-M1"
     val argonaut      = "6.3.13"
     val avro4s        = "4.1.2"
