@@ -83,14 +83,14 @@ trait AvroSupport {
       support: JsonEntityStreamingSupport
   ): SourceOf[ByteString] =
     entitySource
+      // toByteArray returns a fresh array, so it can be wrapped without copying
       .map { obj =>
         val baos   = new ByteArrayOutputStream()
         val stream = AvroOutputStream.json[A].to(baos).build()
         stream.write(obj)
         stream.close()
-        baos.toByteArray
+        ByteString.fromArrayUnsafe(baos.toByteArray)
       }
-      .map(ByteString(_))
       .via(support.framingRenderer)
 
   def unmarshallerContentTypes: Seq[ContentTypeRange] = defaultContentTypes
