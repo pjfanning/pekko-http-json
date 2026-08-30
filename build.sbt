@@ -60,6 +60,7 @@ lazy val `pekko-http-json` =
       `pekko-http-avro4s`,
       `pekko-http-circe`,
       `pekko-http-circe-base`,
+      `pekko-http-fory-json-scala`,
       `pekko-http-jackson`,
       `pekko-http-jackson3`,
       `pekko-http-json4s`,
@@ -120,6 +121,18 @@ lazy val `pekko-http-circe-base` =
         Library.pekkoHttp,
         Library.circe,
         Library.pekkoStream % Provided
+      )
+    )
+
+lazy val `pekko-http-fory-json-scala` =
+  project
+    .settings(commonSettings, withScala3)
+    .settings(
+      libraryDependencies ++= Seq(
+        Library.pekkoHttp,
+        Library.foryJsonScala,
+        Library.pekkoStream % Provided,
+        Library.scalaTest   % Test,
       )
     )
 
