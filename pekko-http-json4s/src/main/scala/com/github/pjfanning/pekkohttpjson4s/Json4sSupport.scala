@@ -36,8 +36,9 @@ import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import com.github.pjfanning.pekkohttpjson4s.Json4sSupport.ShouldWritePretty.False
-import org.json4s.{ Formats, MappingException, Serialization }
+import org.json4s.{ Formats, MappingException, ReaderInput, Serialization }
 
+import java.io.InputStreamReader
 import java.lang.reflect.InvocationTargetException
 import scala.collection.immutable.Seq
 import scala.concurrent.{ ExecutionContext, Future }
@@ -74,12 +75,14 @@ trait Json4sSupport {
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
   def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
 
-  private val jsonStringUnmarshaller =
+  private val jsonInputUnmarshaller =
     Unmarshaller.byteStringUnmarshaller
       .forContentTypes(unmarshallerContentTypes: _*)
       .mapWithCharset {
         case (ByteString.empty, _) => throw Unmarshaller.NoContentException
-        case (data, charset)       => data.decodeString(charset.nioCharset.name)
+        // reading from the bytes avoids materialising the whole entity as a String
+        case (data, charset) =>
+          ReaderInput(new InputStreamReader(data.asInputStream, charset.nioCharset))
       }
 
   private val jsonStringMarshaller =
@@ -130,8 +133,8 @@ trait Json4sSupport {
       serialization: Serialization,
       formats: Formats
   ): FromEntityUnmarshaller[A] =
-    jsonStringUnmarshaller
-      .map(s => serialization.read(s))
+    jsonInputUnmarshaller
+      .map(input => serialization.read(input))
       .recover(throwCause)
 
   /**

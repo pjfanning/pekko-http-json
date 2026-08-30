@@ -32,6 +32,8 @@ import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import play.api.libs.json.{ JsError, JsResultException, JsValue, Json, Reads, Writes }
 
+import java.nio.charset.StandardCharsets
+
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -60,12 +62,17 @@ trait PlayJsonSupport {
   private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
   def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
 
-  private val jsonStringUnmarshaller =
+  private val jsonValueUnmarshaller =
     Unmarshaller.byteStringUnmarshaller
       .forContentTypes(unmarshallerContentTypes: _*)
       .mapWithCharset {
-        case (ByteString.empty, _) => throw Unmarshaller.NoContentException
-        case (data, charset)       => data.decodeString(charset.nioCharset.name)
+        case (ByteString.empty, _) =>
+          throw Unmarshaller.NoContentException
+        case (data, charset) if charset.nioCharset == StandardCharsets.UTF_8 =>
+          // parsing the bytes avoids materialising the whole entity as a String
+          Json.parse(data.asInputStream)
+        case (data, charset) =>
+          Json.parse(data.decodeString(charset.nioCharset))
       }
 
   private def sourceByteStringMarshaller(
@@ -115,7 +122,7 @@ trait PlayJsonSupport {
     *   unmarshaller for `A`
     */
   implicit def unmarshaller[A: Reads]: FromEntityUnmarshaller[A] =
-    jsonStringUnmarshaller.map(data => read(Json.parse(data)))
+    jsonValueUnmarshaller.map(json => read[A](json))
 
   /**
     * `A` => HTTP entity
