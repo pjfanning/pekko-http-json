@@ -35,7 +35,6 @@ import com.sksamuel.avro4s.{
 }
 
 import java.io.ByteArrayOutputStream
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 

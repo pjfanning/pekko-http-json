@@ -34,7 +34,6 @@ import play.api.libs.json.{ JsError, JsResultException, JsValue, Json, Reads, Wr
 
 import java.nio.charset.StandardCharsets
 
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 

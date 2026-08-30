@@ -32,7 +32,6 @@ import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 import nrktkt.ninny._
 
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
@@ -59,7 +58,7 @@ trait NinnySupport {
       .forContentTypes(unmarshallerContentTypes: _*)
       .mapWithCharset {
         case (ByteString.empty, _) => throw Unmarshaller.NoContentException
-        case (data, charset)       => data.decodeString(charset.nioCharset.name)
+        case (data, charset)       => data.decodeString(charset.nioCharset)
       }
       .map(Json.parse(_).to[A].get)
 
