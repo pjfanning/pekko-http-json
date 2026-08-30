@@ -26,11 +26,7 @@ import org.apache.pekko.http.scaladsl.model.{
   MessageEntity
 }
 import org.apache.pekko.http.scaladsl.model.MediaTypes.`application/json`
-import org.apache.pekko.http.scaladsl.unmarshalling.{
-  FromEntityUnmarshaller,
-  Unmarshal,
-  Unmarshaller
-}
+import org.apache.pekko.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
 import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
@@ -161,8 +157,11 @@ trait ArgonautSupport {
   ): FromEntityUnmarshaller[SourceOf[A]] =
     Unmarshaller
       .withMaterializer[HttpEntity, SourceOf[A]] { implicit ec => implicit mat => entity =>
+        // resolved once per unmarshalling operation rather than once per stream element
+        val elementUnmarshaller = implicitly[Unmarshaller[ByteString, A]]
+
         def asyncParse(bs: ByteString) =
-          Unmarshal(bs).to[A]
+          elementUnmarshaller(bs)
 
         def ordered =
           Flow[ByteString].mapAsync(support.parallelism)(asyncParse)
