@@ -125,7 +125,7 @@ final class ZioJsonSupportSpec
         .value shouldBe a[String]
     }
 
-    val errorMessage = """.a(expected '"' got '1')"""
+    val errorMessage = ".a(expected string)"
 
     "fail-fast and return only the first unmarshalling error" in {
       val entity = HttpEntity(`application/json`, """{ "a": 1, "b": 2 }""")
