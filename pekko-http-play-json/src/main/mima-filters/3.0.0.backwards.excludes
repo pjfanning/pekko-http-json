@@ -1,0 +1,7 @@
+# Binary incompatibilities introduced since the 3.0.0 release.
+#
+# https://github.com/pjfanning/pekko-http-json/pull/298
+# The private jsonStringUnmarshaller became jsonValueUnmarshaller when the entity unmarshaller
+# switched from decoding the entity to a String to parsing its InputStream.
+ProblemFilters.exclude[ReversedMissingMethodProblem]("com.github.pjfanning.pekkohttpplayjson.PlayJsonSupport.com$github$pjfanning$pekkohttpplayjson$PlayJsonSupport$_setter_$com$github$pjfanning$pekkohttpplayjson$PlayJsonSupport$$jsonValueUnmarshaller_=")
+ProblemFilters.exclude[ReversedMissingMethodProblem]("com.github.pjfanning.pekkohttpplayjson.PlayJsonSupport.com$github$pjfanning$pekkohttpplayjson$PlayJsonSupport$$jsonValueUnmarshaller")

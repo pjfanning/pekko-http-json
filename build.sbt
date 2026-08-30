@@ -43,8 +43,22 @@ inThisBuild(
   )
 )
 
+// commonSettings brings mimaPreviousArtifacts along to the root project, where MimaPlugin is
+// disabled, so sbt would otherwise lint it as unused
+Global / excludeLintKeys += mimaPreviousArtifacts
+
 val withScala3 = Seq(
   crossScalaVersions += "3.3.8",
+)
+
+// Binary compatibility is checked against the 3.0.0 release
+val mimaSettings = Seq(
+  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % "3.0.0")
+)
+
+// Modules with no 3.0.0 release to compare against
+val noMimaSettings = Seq(
+  mimaPreviousArtifacts := Set.empty
 )
 
 // fory-json-scala is only published for Scala 2.13 and Scala 3
@@ -140,6 +154,7 @@ lazy val `pekko-http-circe` =
 lazy val `pekko-http-circe-base` =
   project
     .settings(commonSettings, targetJava8, withScala3)
+    .settings(noMimaSettings)
     .settings(publishArtifact := false)
     .settings(
       libraryDependencies ++= Seq(
@@ -152,6 +167,7 @@ lazy val `pekko-http-circe-base` =
 lazy val `pekko-http-fory-json-scala` =
   project
     .settings(commonSettings, targetJava8, scala213AndScala3)
+    .settings(noMimaSettings)
     .settings(
       libraryDependencies ++= Seq(
         Library.pekkoHttp,
@@ -177,6 +193,7 @@ lazy val `pekko-http-jackson` =
 lazy val `pekko-http-jackson3` =
   project
     .settings(commonSettings, targetJava17, withScala3)
+    .settings(noMimaSettings)
     .settings(
       libraryDependencies ++= Seq(
         Library.pekkoHttp,
@@ -216,6 +233,7 @@ lazy val `pekko-http-jsoniter-scala` =
 lazy val `pekko-http-jsoniter-scala-circe` =
   project
     .settings(commonSettings, targetJava8, withScala3)
+    .settings(noMimaSettings)
     .dependsOn(
       `pekko-http-circe-base` % "compile-internal->compile-internal;test-internal->test-internal"
     )
@@ -301,7 +319,7 @@ lazy val `pekko-http-zio-json` =
 // *****************************************************************************
 
 lazy val commonSettings =
-  Seq(
+  mimaSettings ++ Seq(
     // Also (automatically) format build definition together with sources
     Compile / scalafmt := {
       val _ = (Compile / scalafmtSbt).value

@@ -33,6 +33,8 @@ jobs:
           key: ${{ runner.os }}-sbt-${{ hashFiles('build.sbt', 'project/plugins.sbt') }}
       - name: Run tests
         run: sbt +test
+      - name: Check binary compatibility
+        run: sbt +mimaReportBinaryIssues
 
   publish:
     name: Publish Artifacts
