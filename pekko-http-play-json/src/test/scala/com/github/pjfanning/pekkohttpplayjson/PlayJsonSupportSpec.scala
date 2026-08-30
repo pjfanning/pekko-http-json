@@ -26,7 +26,7 @@ import org.apache.pekko.stream.scaladsl.{ Sink, Source }
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
-import play.api.libs.json.{ Format, Json }
+import play.api.libs.json.{ Format, JsValue, Json }
 import scala.collection.immutable.Seq
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -54,6 +54,24 @@ final class PlayJsonSupportSpec extends AsyncWordSpec with Matchers with BeforeA
         .to[RequestEntity]
         .flatMap(Unmarshal(_).to[Foo])
         .map(_ shouldBe foo)
+    }
+
+    "marshal to compact json by default" in
+    Marshal(Foo("bar"))
+      .to[RequestEntity]
+      .map(_.asInstanceOf[HttpEntity.Strict].data.utf8String shouldBe """{"bar":"bar"}""")
+
+    "marshal to pretty json when a printer is in scope" in {
+      implicit val printer: JsValue => String = Json.prettyPrint
+
+      val expected =
+        """|{
+           |  "bar" : "bar"
+           |}""".stripMargin
+
+      Marshal(Foo("bar"))
+        .to[RequestEntity]
+        .map(_.asInstanceOf[HttpEntity.Strict].data.utf8String shouldBe expected)
     }
 
     "enable streamed marshalling and unmarshalling for json arrays" in {
