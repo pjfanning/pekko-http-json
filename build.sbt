@@ -51,12 +51,18 @@ val withScala3 = Seq(
   crossScalaVersions += "3.3.8",
 )
 
-// Binary compatibility is checked against the 3.0.0 release
-val mimaSettings = Seq(
-  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % "3.0.0")
+// Binary compatibility is checked against the named release - 3.0.0 for the modules that already
+// existed then, and its own first release for a module added later
+def mimaSettingsSince(version: String) = Seq(
+  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % version),
+  // check the jar that actually gets published: the circe modules copy the classes of the
+  // unpublished pekko-http-circe-base into it, and those are not in the class directory
+  mimaCurrentClassfiles := (Compile / packageBin).value
 )
 
-// Modules with no 3.0.0 release to compare against
+val mimaSettings = mimaSettingsSince("3.0.0")
+
+// Modules with no release to compare against at all
 val noMimaSettings = Seq(
   mimaPreviousArtifacts := Set.empty
 )
@@ -193,7 +199,7 @@ lazy val `pekko-http-jackson` =
 lazy val `pekko-http-jackson3` =
   project
     .settings(commonSettings, targetJava17, withScala3)
-    .settings(noMimaSettings)
+    .settings(mimaSettingsSince("3.1.0"))
     .settings(
       libraryDependencies ++= Seq(
         Library.pekkoHttp,
@@ -233,7 +239,7 @@ lazy val `pekko-http-jsoniter-scala` =
 lazy val `pekko-http-jsoniter-scala-circe` =
   project
     .settings(commonSettings, targetJava8, withScala3)
-    .settings(noMimaSettings)
+    .settings(mimaSettingsSince("3.1.0"))
     .dependsOn(
       `pekko-http-circe-base` % "compile-internal->compile-internal;test-internal->test-internal"
     )
