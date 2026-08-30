@@ -105,19 +105,18 @@ trait AvroSupport {
     * @return
     *   unmarshaller for any `A` value
     */
-  implicit def fromByteStringUnmarshaller[A: SchemaFor: Decoder]: Unmarshaller[ByteString, A] =
+  implicit def fromByteStringUnmarshaller[A: SchemaFor: Decoder]: Unmarshaller[ByteString, A] = {
+    // building the schema is expensive, so it is done once rather than per value decoded
+    val schema = AvroSchema[A]
     Unmarshaller { ec => bs =>
       Future {
-        val schema = AvroSchema[A]
         if (bs.isEmpty) throw Unmarshaller.NoContentException
-        AvroInputStream
-          .json[A]
-          .from(bs.asInputStream)
-          .build(schema)
-          .iterator
-          .next()
+        val in = AvroInputStream.json[A].from(bs.asInputStream).build(schema)
+        try in.iterator.next()
+        finally in.close()
       }(ec)
     }
+  }
 
   /**
     * HTTP entity => `A`
@@ -126,7 +125,9 @@ trait AvroSupport {
     val schema = AvroSchema[A]
     byteArrayUnmarshaller.map { bytes =>
       if (bytes.isEmpty) throw Unmarshaller.NoContentException
-      AvroInputStream.json[A].from(bytes).build(schema).iterator.next()
+      val in = AvroInputStream.json[A].from(bytes).build(schema)
+      try in.iterator.next()
+      finally in.close()
     }
   }
 
