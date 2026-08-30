@@ -39,8 +39,6 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 import zio.json._
-import zio.stream.ZStream
-import zio.Unsafe
 
 object ZioJsonSupport extends ZioJsonSupport
 
@@ -103,9 +101,14 @@ trait ZioJsonSupport {
       jd: JsonDecoder[A],
       rt: zio.Runtime[Any]
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller { _ => bs =>
-      val decoded = jd.decodeJsonStreamInput(ZStream.fromIterable(bs))
-      Unsafe.unsafeCompat(implicit u => rt.unsafe.runToFuture(decoded))
+    Unmarshaller { ec => bs =>
+      // `rt` is no longer used but is kept for source and binary compatibility
+      Future {
+        jd.decodeJson(bs.utf8String) match {
+          case Right(a)  => a
+          case Left(err) => throw new Exception(err)
+        }
+      }(ec)
     }
 
   /**
