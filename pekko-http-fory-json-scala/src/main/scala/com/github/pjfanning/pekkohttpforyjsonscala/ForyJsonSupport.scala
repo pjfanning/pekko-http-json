@@ -116,7 +116,9 @@ trait ForyJsonSupport {
       support: JsonEntityStreamingSupport
   ): SourceOf[ByteString] =
     entitySource
-      .map(a => ByteString(foryJson.toJson(a, typeRef)))
+      // toJsonBytes returns a fresh array, so it can be wrapped without copying, and it avoids
+      // materialising each element as a String on the way
+      .map(a => ByteString.fromArrayUnsafe(foryJson.toJsonBytes(a, typeRef)))
       .via(support.framingRenderer)
 
   /**
@@ -151,7 +153,7 @@ trait ForyJsonSupport {
     val mediaType   = mediaTypes.head
     val contentType = ContentType.WithFixedCharset(mediaType)
     Marshaller.withFixedContentType(contentType) { obj =>
-      HttpEntity.Strict(contentType, ByteString(foryJson.toJson(obj, typeRef)))
+      HttpEntity.Strict(contentType, ByteString.fromArrayUnsafe(foryJson.toJsonBytes(obj, typeRef)))
     }
   }
 
