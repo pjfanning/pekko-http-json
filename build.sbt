@@ -47,6 +47,11 @@ val withScala3 = Seq(
   crossScalaVersions += "3.3.8",
 )
 
+// fory-json-scala is only published for Scala 2.13 and Scala 3
+val scala213AndScala3 = Seq(
+  crossScalaVersions := Seq("2.13.18", "3.3.8"),
+)
+
 val targetJava8 = Seq(
   javacOptions ++= Seq(
     "--release",
@@ -80,6 +85,7 @@ lazy val `pekko-http-json` =
       `pekko-http-avro4s`,
       `pekko-http-circe`,
       `pekko-http-circe-base`,
+      `pekko-http-fory-json-scala`,
       `pekko-http-jackson`,
       `pekko-http-jackson3`,
       `pekko-http-json4s`,
@@ -140,6 +146,18 @@ lazy val `pekko-http-circe-base` =
         Library.pekkoHttp,
         Library.circe,
         Library.pekkoStream % Provided
+      )
+    )
+
+lazy val `pekko-http-fory-json-scala` =
+  project
+    .settings(commonSettings, targetJava8, scala213AndScala3)
+    .settings(
+      libraryDependencies ++= Seq(
+        Library.pekkoHttp,
+        Library.foryJsonScala,
+        Library.pekkoStream % Provided,
+        Library.scalaTest   % Test,
       )
     )
 
