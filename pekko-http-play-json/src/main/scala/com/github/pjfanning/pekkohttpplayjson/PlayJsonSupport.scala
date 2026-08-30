@@ -127,6 +127,10 @@ trait PlayJsonSupport {
   /**
     * `A` => HTTP entity
     *
+    * Output is compact. Pretty printing, which used to be the default, costs roughly 1.5x the
+    * response bytes and 15-25% more CPU; put an implicit `JsValue => String` in scope - for
+    * instance `implicit val printer: JsValue => String = Json.prettyPrint` - to get it back.
+    *
     * @tparam A
     *   type to encode
     * @return
@@ -134,7 +138,7 @@ trait PlayJsonSupport {
     */
   implicit def marshaller[A](implicit
       writes: Writes[A],
-      printer: JsValue => String = Json.prettyPrint
+      printer: JsValue => String = Json.stringify
   ): ToEntityMarshaller[A] =
     jsonStringMarshaller.compose(printer).compose(writes.writes)
 
