@@ -15,6 +15,7 @@ pekko-http-json provides JSON (un)marshalling support for [Apache Pekko HTTP](ht
 - [avro4s](https://github.com/sksamuel/avro4s)
 - [AVSystem GenCodec](https://github.com/AVSystem/scala-commons/blob/master/docs/GenCodec.md)
 - [circe](https://circe.github.io/circe/)
+- [Fory JSON](https://fory.apache.org) via [fory-json-scala](https://github.com/apache/fory) - Scala 2.13 and Scala 3 only
 - [Jackson](https://github.com/FasterXML/jackson) via [Scala Module](https://github.com/FasterXML/jackson-module-scala) by default
   - pekko-http-jackson v2.0.x supports Jackson 2.14
   - pekko-http-jackson v2.1.x supports Jackson 2.15
