@@ -177,8 +177,8 @@ trait JacksonSupport {
       support: JsonEntityStreamingSupport
   ): SourceOf[ByteString] =
     entitySource
-      .map(objectMapper.writeValueAsBytes)
-      .map(ByteString(_))
+      // writeValueAsBytes returns a fresh array, so it can be wrapped without copying
+      .map(a => ByteString.fromArrayUnsafe(objectMapper.writeValueAsBytes(a)))
       .via(support.framingRenderer)
 
   /**
