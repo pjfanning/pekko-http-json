@@ -61,6 +61,19 @@ object ForyJsonSupport extends ForyJsonSupport {
 
 /**
   * JSON marshalling/unmarshalling using Fory's JSON support.
+  *
+  * Every marshaller and unmarshaller takes the `ForyJson` to use as an implicit parameter,
+  * defaulting to [[ForyJsonSupport.defaultForyJson]]. Put your own in scope to configure Fory -
+  * naming strategy, null handling, and the parsing limits worth setting for untrusted input:
+  *
+  * {{{
+  * implicit val foryJson: ForyJson =
+  *   ForyJsonScala
+  *     .builder()
+  *     .maxDepth(32)
+  *     .withMaxGraphMemoryBytes(8 * 1024 * 1024)
+  *     .build()
+  * }}}
   */
 trait ForyJsonSupport {
   type SourceOf[A] = Source[A, _]

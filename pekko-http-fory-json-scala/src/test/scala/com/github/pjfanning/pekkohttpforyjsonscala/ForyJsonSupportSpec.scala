@@ -21,7 +21,8 @@ import org.apache.pekko.http.scaladsl.model.ContentTypes.{ `application/json`, `
 import org.apache.pekko.http.scaladsl.unmarshalling.{ Unmarshal, Unmarshaller }
 import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshaller.UnsupportedContentTypeException
 import org.apache.pekko.stream.scaladsl.{ Sink, Source }
-import org.apache.fory.json.scala.ScalaTypeRef
+import org.apache.fory.json.{ ForyJson, PropertyNamingStrategy }
+import org.apache.fory.json.scala.{ ForyJsonScala, ScalaTypeRef }
 import org.apache.fory.reflect.TypeRef
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
@@ -32,6 +33,8 @@ import scala.concurrent.duration.DurationInt
 // Fory leaves the fields of a case class declared inside an `object` unset, so the types used here
 // are declared at the top level rather than in a companion object like the other modules' specs.
 final case class Foo(bar: String)
+
+final case class SnakeFoo(barBaz: String)
 
 final class ForyJsonSupportSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
   import ForyJsonSupport._
@@ -61,6 +64,37 @@ final class ForyJsonSupportSpec extends AsyncWordSpec with Matchers with BeforeA
         .flatMap(entity => Unmarshal(entity).to[SourceOf[Foo]])
         .flatMap(_.runWith(Sink.seq))
         .map(_ shouldBe foos)
+    }
+
+    "use a ForyJson provided in implicit scope" in {
+      implicit val snakeCaseFory: ForyJson = ForyJsonScala
+        .builder()
+        .withPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+        .build()
+      implicit val snakeFooTypeRef: TypeRef[SnakeFoo] = ScalaTypeRef[SnakeFoo]
+
+      Marshal(SnakeFoo("baz"))
+        .to[RequestEntity]
+        .map(_.asInstanceOf[HttpEntity.Strict].data.utf8String shouldBe """{"bar_baz":"baz"}""")
+    }
+
+    "unmarshal with a ForyJson provided in implicit scope" in {
+      implicit val snakeCaseFory: ForyJson = ForyJsonScala
+        .builder()
+        .withPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+        .build()
+      implicit val snakeFooTypeRef: TypeRef[SnakeFoo] = ScalaTypeRef[SnakeFoo]
+
+      val entity = HttpEntity(`application/json`, """{"bar_baz":"baz"}""")
+      Unmarshal(entity).to[SnakeFoo].map(_ shouldBe SnakeFoo("baz"))
+    }
+
+    "use the default ForyJson when none is in scope" in {
+      implicit val snakeFooTypeRef: TypeRef[SnakeFoo] = ScalaTypeRef[SnakeFoo]
+
+      Marshal(SnakeFoo("baz"))
+        .to[RequestEntity]
+        .map(_.asInstanceOf[HttpEntity.Strict].data.utf8String shouldBe """{"barBaz":"baz"}""")
     }
 
     "fail with NoContentException when unmarshalling empty entities" in {
