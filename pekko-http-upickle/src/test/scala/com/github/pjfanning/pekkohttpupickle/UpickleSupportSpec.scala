@@ -72,7 +72,8 @@ final class UpickleSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
       Unmarshal(entity)
         .to[Foo]
         .failed
-        .map(_ should have message "requirement failed: bar must start with 'bar'!")
+        // upickle wraps reader exceptions in a TraceException that reports the JSON path
+        .map(_.getCause should have message "requirement failed: bar must start with 'bar'!")
     }
 
     "fail with NoContentException when unmarshalling empty entities" in {
