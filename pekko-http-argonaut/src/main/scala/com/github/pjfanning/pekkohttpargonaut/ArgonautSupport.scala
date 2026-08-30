@@ -62,7 +62,7 @@ trait ArgonautSupport {
       .forContentTypes(unmarshallerContentTypes: _*)
       .mapWithCharset {
         case (ByteString.empty, _) => throw Unmarshaller.NoContentException
-        case (data, charset)       => data.decodeString(charset.nioCharset.name)
+        case (data, charset)       => data.decodeString(charset.nioCharset)
       }
 
   private val jsonStringMarshaller =
