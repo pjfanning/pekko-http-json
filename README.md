@@ -13,7 +13,6 @@ This is a fork of [akka-http-json](https://github.com/hseeberger/akka-http-json)
 pekko-http-json provides JSON (un)marshalling support for [Apache Pekko HTTP](https://github.com/apache/incubator-pekko-http) via the following JSON libraries:
 - [Argonaut](https://github.com/argonaut-io/argonaut)
 - [avro4s](https://github.com/sksamuel/avro4s)
-- [AVSystem GenCodec](https://github.com/AVSystem/scala-commons/blob/master/docs/GenCodec.md)
 - [circe](https://circe.github.io/circe/)
 - [Fory JSON](https://fory.apache.org) via [fory-json-scala](https://github.com/apache/fory)
 - [Jackson](https://github.com/FasterXML/jackson) via [Scala Module](https://github.com/FasterXML/jackson-module-scala) by default
