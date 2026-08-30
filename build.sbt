@@ -36,7 +36,7 @@ inThisBuild(
       "-language:_",
       "-encoding",
       "UTF-8",
-      "-Ywarn-unused:imports"
+      "-Wunused:imports"
     ),
     scalafmtOnCompile := true,
     dynverSeparator   := "_" // the default `+` is not compatible with docker tags

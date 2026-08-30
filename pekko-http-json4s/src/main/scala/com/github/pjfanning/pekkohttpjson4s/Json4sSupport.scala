@@ -36,7 +36,6 @@ import org.json4s.{ Formats, MappingException, ReaderInput, Serialization }
 
 import java.io.InputStreamReader
 import java.lang.reflect.InvocationTargetException
-import scala.collection.immutable.Seq
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 
