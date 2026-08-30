@@ -90,8 +90,8 @@ trait JsoniterScalaSupport {
       support: JsonEntityStreamingSupport
   ): SourceOf[ByteString] =
     entitySource
-      .map(writeToArray(_, config))
-      .map(ByteString(_))
+      // writeToArray returns a fresh array, so it can be wrapped without copying
+      .map(a => ByteString.fromArrayUnsafe(writeToArray(a, config)))
       .via(support.framingRenderer)
 
   def unmarshallerContentTypes: Seq[ContentTypeRange] = defaultContentTypes
