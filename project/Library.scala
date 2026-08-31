@@ -17,7 +17,7 @@ object Library {
     val play          = "3.0.6"
     val scalaTest     = "3.2.20"
     val upickle       = "4.4.3"
-    val zioJson       = "0.7.45"
+    val zioJson       = "0.10.0"
   }
   // format: off
   val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
