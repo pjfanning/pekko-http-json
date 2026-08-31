@@ -25,6 +25,8 @@ pekko-http-json provides JSON (un)marshalling support for [Apache Pekko HTTP](ht
   - pekko-http-jackson v2.3.x supports Jackson 2.16
     - pekko-http-jackson uses the default Jackson constraints (including some new to Jackson 2.16) but you can override them by overriding the configs in [reference.conf](https://github.com/pjfanning/pekko-http-json/blob/main/pekko-http-jackson/src/main/resources/reference.conf)
   - pekko-http-jackson v2.5.x supports Jackson 2.17
+  - pekko-http-jackson3 supports [Jackson 3](https://github.com/FasterXML/jackson-3) and, as well as
+    JSON, can marshal and unmarshal [CBOR](https://cbor.io) - see below
 - [Json4s](https://github.com/json4s/json4s)
 - [jsoniter-scala](https://github.com/plokhotnyuk/jsoniter-scala)
 - [ninny](https://nrktkt.github.io/ninny-json/USERGUIDE)
@@ -56,6 +58,34 @@ resolvers += "Sonatype Central Snapshots" at "https://central.sonatype.com/repos
 ## Usage
 
 Use respective support trait or object, e.g. `ArgonautSupport`, `FailFastCirceSupport`, etc. into your Pekko HTTP code which is supposed to (un)marshal from/to JSON. Don't forget to provide the type class instances for the respective JSON libraries, if needed.
+
+### CBOR with pekko-http-jackson3
+
+`pekko-http-jackson3` marshals to JSON by default. It can marshal to CBOR instead, either for the
+whole application:
+
+``` hocon
+pekko-http-json.jackson.format = "cbor"
+```
+
+or for the routes you pick, by importing `CborSupport` (or `JsonSupport`, which stays on JSON
+whatever the config says) instead of `JacksonSupport`:
+
+``` scala
+import com.github.pjfanning.pekkohttpjackson3.CborSupport._
+```
+
+Either way, entities are marshalled to and unmarshalled from `application/cbor`, and the
+`pekko-http-json.jackson.read` and `write` settings apply just as they do to JSON. The
+`jackson-dataformat-cbor` jar is an optional dependency of `pekko-http-jackson3`, so add it to your
+build to use CBOR:
+
+``` scala
+libraryDependencies += "tools.jackson.dataformat" % "jackson-dataformat-cbor" % "3.2.2"
+```
+
+The `Source` based streaming marshallers frame their output as a JSON array, so they remain
+JSON only; they throw an `UnsupportedOperationException` when the data format is CBOR.
 
 ## Contribution policy ##
 

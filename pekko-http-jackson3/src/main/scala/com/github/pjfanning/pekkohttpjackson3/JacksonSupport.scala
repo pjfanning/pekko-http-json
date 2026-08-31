@@ -16,38 +16,31 @@
 
 package com.github.pjfanning.pekkohttpjackson3
 
-import tools.jackson.core.util.{ BufferRecycler, JsonRecyclerPools, RecyclerPool }
-import tools.jackson.core.{
-  JsonParser,
-  ObjectReadContext,
-  StreamReadConstraints,
-  StreamReadFeature,
-  StreamWriteConstraints
-}
-import tools.jackson.core.json.{ JsonFactory, JsonFactoryBuilder }
+import tools.jackson.core.{ JsonParser, ObjectReadContext }
+import tools.jackson.core.json.JsonFactory
 import tools.jackson.core.async.ByteBufferFeeder
-import tools.jackson.databind.{ DeserializationFeature, JacksonModule, ObjectMapper }
-import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.ObjectMapper
 import tools.jackson.module.scala.{ ClassTagExtensions, JavaTypeable }
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.Config
 import org.apache.pekko.http.javadsl.common.JsonEntityStreamingSupport
 import org.apache.pekko.http.scaladsl.common.EntityStreamingSupport
 import org.apache.pekko.http.scaladsl.marshalling._
 import org.apache.pekko.http.scaladsl.model.{
+  ContentType,
   ContentTypeRange,
+  HttpCharsets,
   HttpEntity,
   MediaType,
   MessageEntity
 }
-import org.apache.pekko.http.scaladsl.model.MediaTypes.`application/json`
 import org.apache.pekko.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
 import org.apache.pekko.http.scaladsl.util.FastFuture
 import org.apache.pekko.stream.scaladsl.{ Flow, Source }
 import org.apache.pekko.util.ByteString
 
+import java.util.concurrent.ConcurrentHashMap
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -55,81 +48,71 @@ import scala.util.control.NonFatal
   */
 object JacksonSupport extends JacksonSupport {
 
-  private[pekkohttpjackson3] val jacksonConfig =
-    ConfigFactory.load().getConfig("pekko-http-json.jackson")
+  private[pekkohttpjackson3] val jacksonConfig = JacksonConfigSupport.jacksonConfig
 
-  private[pekkohttpjackson3] def createJsonFactory(config: Config): JsonFactory = {
-    val streamReadConstraints = StreamReadConstraints
-      .builder()
-      .maxNestingDepth(config.getInt("read.max-nesting-depth"))
-      .maxNumberLength(config.getInt("read.max-number-length"))
-      .maxStringLength(config.getInt("read.max-string-length"))
-      .maxNameLength(config.getInt("read.max-name-length"))
-      .maxDocumentLength(config.getInt("read.max-document-length"))
-      .maxTokenCount(config.getInt("read.max-token-count"))
-      .build()
-    val streamWriteConstraints = StreamWriteConstraints
-      .builder()
-      .maxNestingDepth(config.getInt("write.max-nesting-depth"))
-      .build()
-    val jsonFactoryBuilder: JsonFactoryBuilder = JsonFactory
-      .builder()
-      .asInstanceOf[JsonFactoryBuilder]
-      .streamReadConstraints(streamReadConstraints)
-      .streamWriteConstraints(streamWriteConstraints)
-      .recyclerPool(getBufferRecyclerPool(config))
-      .configure(
-        StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION,
-        config.getBoolean("read.feature.include-source-in-location")
-      )
-    jsonFactoryBuilder.build()
-  }
+  private[pekkohttpjackson3] def createJsonFactory(config: Config): JsonFactory =
+    JacksonConfigSupport.createJsonFactory(config)
 
-  private def getBufferRecyclerPool(cfg: Config): RecyclerPool[BufferRecycler] =
-    cfg.getString("buffer-recycler.pool-instance") match {
-      case "thread-local"            => JsonRecyclerPools.threadLocalPool()
-      case "concurrent-deque"        => JsonRecyclerPools.newConcurrentDequePool()
-      case "shared-concurrent-deque" => JsonRecyclerPools.sharedConcurrentDequePool()
-      case "bounded"                 =>
-        JsonRecyclerPools.newBoundedPool(cfg.getInt("buffer-recycler.bounded-pool-size"))
-      case "non-recycling" => JsonRecyclerPools.nonRecyclingPool()
-      case other           => throw new IllegalArgumentException(s"Unknown recycler-pool: $other")
-    }
+  private val objectMappers =
+    new ConcurrentHashMap[JacksonDataFormat, ObjectMapper with ClassTagExtensions]
 
-  val defaultObjectMapper: ObjectMapper with ClassTagExtensions = createObjectMapper(jacksonConfig)
+  /**
+    * The mapper used for `dataFormat` when none is passed in explicitly. Built from
+    * `pekko-http-json.jackson` on first use, and then reused.
+    */
+  def objectMapperFor(dataFormat: JacksonDataFormat): ObjectMapper with ClassTagExtensions =
+    objectMappers.computeIfAbsent(
+      dataFormat,
+      (format: JacksonDataFormat) => createObjectMapper(jacksonConfig, format)
+    )
+
+  override val defaultObjectMapper: ObjectMapper with ClassTagExtensions =
+    objectMapperFor(JacksonDataFormat.default)
 
   private[pekkohttpjackson3] def createObjectMapper(
       config: Config
-  ): ObjectMapper with ClassTagExtensions = {
-    val builder = JsonMapper.builder(createJsonFactory(config))
-    builder.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-    import org.apache.pekko.util.ccompat.JavaConverters._
-    val configuredModules = config.getStringList("jackson-modules").asScala.toSeq
-    val modules           = configuredModules.map(loadModule)
-    modules.foreach(builder.addModule)
-    builder.build() :: ClassTagExtensions
-  }
+  ): ObjectMapper with ClassTagExtensions =
+    createObjectMapper(config, JacksonDataFormat(config.getString("format")))
 
-  private def loadModule(fcqn: String): JacksonModule = {
-    val inst = Try(Class.forName(fcqn).getConstructor().newInstance())
-      .getOrElse(Class.forName(fcqn + "$").getConstructor().newInstance())
-    inst.asInstanceOf[JacksonModule]
-  }
+  private[pekkohttpjackson3] def createObjectMapper(
+      config: Config,
+      dataFormat: JacksonDataFormat
+  ): ObjectMapper with ClassTagExtensions =
+    dataFormat.createObjectMapper(config)
 }
 
 /**
-  * JSON marshalling/unmarshalling using an in-scope Jackson's ObjectMapper
+  * JSON marshalling/unmarshalling using an in-scope Jackson's ObjectMapper.
+  *
+  * The data format is [[JacksonDataFormat.Json]] unless `pekko-http-json.jackson.format` says
+  * otherwise; override [[dataFormat]] to pin a format regardless of the config, as [[JsonSupport]]
+  * and [[CborSupport]] do. The `Source` based streaming marshallers frame their output as a JSON
+  * array, so they are only available for [[JacksonDataFormat.Json]].
   */
 trait JacksonSupport {
   type SourceOf[A] = Source[A, _]
 
-  import JacksonSupport._
+  /** The data format to marshal to and unmarshal from. */
+  def dataFormat: JacksonDataFormat = JacksonDataFormat.default
 
   def unmarshallerContentTypes: Seq[ContentTypeRange] =
     mediaTypes.map(ContentTypeRange.apply)
 
-  private val defaultMediaTypes: Seq[MediaType.WithFixedCharset] = List(`application/json`)
-  def mediaTypes: Seq[MediaType.WithFixedCharset]                = defaultMediaTypes
+  def mediaTypes: Seq[MediaType] = List(dataFormat.mediaType)
+
+  private def contentTypeOf(mediaType: MediaType): ContentType =
+    ContentType(mediaType, () => HttpCharsets.`UTF-8`)
+
+  /** The mapper used when there is no `ObjectMapper` in implicit scope. */
+  def defaultObjectMapper: ObjectMapper with ClassTagExtensions =
+    JacksonSupport.objectMapperFor(dataFormat)
+
+  private def requireJsonFormat(operation: String): Unit =
+    if (dataFormat != JacksonDataFormat.Json)
+      throw new UnsupportedOperationException(
+        s"$operation frames its output as a JSON array and is only supported for the json data " +
+        s"format, but the data format is ${dataFormat.name}"
+      )
 
   private val jsonStringUnmarshaller =
     Unmarshaller.byteStringUnmarshaller
@@ -139,21 +122,33 @@ trait JacksonSupport {
         case (data, charset)       => data.decodeString(charset.nioCharset)
       }
 
+  // a def rather than a val: a val would add an abstract accessor to the trait, breaking anything
+  // that already implements it
+  private def binaryUnmarshaller =
+    Unmarshaller.byteStringUnmarshaller
+      .forContentTypes(unmarshallerContentTypes: _*)
+      .map {
+        case ByteString.empty => throw Unmarshaller.NoContentException
+        case data             => data.toArrayUnsafe()
+      }
+
   private def sourceByteStringMarshaller(
-      mediaType: MediaType.WithFixedCharset
-  ): Marshaller[SourceOf[ByteString], MessageEntity] =
+      mediaType: MediaType
+  ): Marshaller[SourceOf[ByteString], MessageEntity] = {
+    val contentType = contentTypeOf(mediaType)
     Marshaller[SourceOf[ByteString], MessageEntity] { implicit ec => value =>
       try
         FastFuture.successful {
           Marshalling.WithFixedContentType(
-            mediaType,
-            () => HttpEntity(contentType = mediaType, data = value)
+            contentType,
+            () => HttpEntity(contentType = contentType, data = value)
           ) :: Nil
         }
       catch {
         case NonFatal(e) => FastFuture.failed(e)
       }
     }
+  }
 
   private val jsonSourceStringMarshaller =
     Marshaller.oneOf(mediaTypes: _*)(sourceByteStringMarshaller)
@@ -173,7 +168,12 @@ trait JacksonSupport {
   implicit def unmarshaller[A: JavaTypeable](implicit
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): FromEntityUnmarshaller[A] =
-    jsonStringUnmarshaller.map(data => objectMapper.readValue[A](data))
+    dataFormat match {
+      case JacksonDataFormat.Json =>
+        jsonStringUnmarshaller.map(data => objectMapper.readValue[A](data))
+      case _ =>
+        binaryUnmarshaller.map(data => objectMapper.readValue[A](data))
+    }
 
   /**
     * `A` => HTTP entity
@@ -181,7 +181,15 @@ trait JacksonSupport {
   implicit def marshaller[Object](implicit
       objectMapper: ObjectMapper = defaultObjectMapper
   ): ToEntityMarshaller[Object] =
-    Jackson.marshaller[Object](objectMapper)
+    dataFormat match {
+      case JacksonDataFormat.Json => Jackson.marshaller[Object](objectMapper)
+      case _                      =>
+        Marshaller
+          .oneOf(mediaTypes: _*)(mediaType =>
+            Marshaller.byteArrayMarshaller(contentTypeOf(mediaType))
+          )
+          .compose[Object](objectMapper.writeValueAsBytes)
+    }
 
   /**
     * `ByteString` => `A`
@@ -194,27 +202,36 @@ trait JacksonSupport {
   implicit def fromByteStringUnmarshaller[A: JavaTypeable](implicit
       objectMapper: ObjectMapper with ClassTagExtensions = defaultObjectMapper
   ): Unmarshaller[ByteString, A] =
-    Unmarshaller { ec => bs =>
-      Future {
-        val parser = objectMapper
-          .tokenStreamFactory()
-          .createNonBlockingByteBufferParser(ObjectReadContext.empty())
-          .asInstanceOf[JsonParser with ByteBufferFeeder]
-        try {
-          bs match {
-            case bs: ByteString.ByteStrings =>
-              bs.asByteBuffers.foreach(parser.feedInput)
-            case bytes =>
-              parser.feedInput(bytes.asByteBuffer)
-          }
-          objectMapper.readValue[A](parser)
-        } finally
-          parser.close()
-      }(ec)
+    dataFormat match {
+      case JacksonDataFormat.Json =>
+        Unmarshaller { ec => bs =>
+          Future {
+            val parser = objectMapper
+              .tokenStreamFactory()
+              .createNonBlockingByteBufferParser(ObjectReadContext.empty())
+              .asInstanceOf[JsonParser with ByteBufferFeeder]
+            try {
+              bs match {
+                case bs: ByteString.ByteStrings =>
+                  bs.asByteBuffers.foreach(parser.feedInput)
+                case bytes =>
+                  parser.feedInput(bytes.asByteBuffer)
+              }
+              objectMapper.readValue[A](parser)
+            } finally
+              parser.close()
+          }(ec)
+        }
+      case _ =>
+        Unmarshaller { ec => bs =>
+          Future(objectMapper.readValue[A](bs.toArrayUnsafe()))(ec)
+        }
     }
 
   /**
     * HTTP entity => `Source[A, _]`
+    *
+    * Only supported for [[JacksonDataFormat.Json]].
     *
     * @tparam A
     *   type to decode
@@ -223,7 +240,8 @@ trait JacksonSupport {
     */
   implicit def sourceUnmarshaller[A: JavaTypeable](implicit
       support: JsonEntityStreamingSupport = EntityStreamingSupport.json()
-  ): FromEntityUnmarshaller[SourceOf[A]] =
+  ): FromEntityUnmarshaller[SourceOf[A]] = {
+    requireJsonFormat("Source unmarshalling")
     Unmarshaller
       .withMaterializer[HttpEntity, SourceOf[A]] { implicit ec => implicit mat => entity =>
         // resolved once per unmarshalling operation rather than once per stream element
@@ -245,9 +263,12 @@ trait JacksonSupport {
         }
       }
       .forContentTypes(unmarshallerContentTypes: _*)
+  }
 
   /**
     * `SourceOf[A]` => HTTP entity
+    *
+    * Only supported for [[JacksonDataFormat.Json]].
     *
     * @tparam A
     *   type to encode
@@ -257,6 +278,8 @@ trait JacksonSupport {
   implicit def sourceMarshaller[A](implicit
       objectMapper: ObjectMapper = defaultObjectMapper,
       support: JsonEntityStreamingSupport = EntityStreamingSupport.json()
-  ): ToEntityMarshaller[SourceOf[A]] =
+  ): ToEntityMarshaller[SourceOf[A]] = {
+    requireJsonFormat("Source marshalling")
     jsonSourceStringMarshaller.compose(jsonSource[A])
+  }
 }

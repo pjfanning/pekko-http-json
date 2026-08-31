@@ -19,6 +19,8 @@ package com.github.pjfanning.pekkohttpjackson3
 import tools.jackson.core.StreamReadFeature
 import tools.jackson.core.util.JsonRecyclerPools.BoundedPool
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.core.json.JsonFactory
+import tools.jackson.dataformat.cbor.CBORFactory
 import tools.jackson.module.scala.DefaultScalaModule
 import com.typesafe.config.ConfigFactory
 import org.apache.pekko.actor.ActorSystem
@@ -160,6 +162,30 @@ final class JacksonSupportSpec extends AsyncWordSpec with Matchers with BeforeAn
         .builder(testFactory)
         .build()
         .isEnabled(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION) shouldBe true
+    }
+
+    "default the data format to json" in {
+      JacksonSupport.jacksonConfig.getString("format") shouldEqual "json"
+      JacksonDataFormat.default shouldBe JacksonDataFormat.Json
+      JacksonSupport.dataFormat shouldBe JacksonDataFormat.Json
+      JsonSupport.dataFormat shouldBe JacksonDataFormat.Json
+      JacksonSupport.mediaTypes shouldEqual List(MediaTypes.`application/json`)
+      JacksonSupport.defaultObjectMapper shouldBe a[JsonMapper]
+    }
+
+    "build the mapper named by pekko-http-json.jackson.format" in {
+      val cborCfg = ConfigFactory
+        .parseString("""format = "cbor"""")
+        .withFallback(JacksonSupport.jacksonConfig)
+      JacksonSupport.createObjectMapper(cborCfg).tokenStreamFactory() shouldBe a[CBORFactory]
+      JacksonSupport
+        .createObjectMapper(JacksonSupport.jacksonConfig)
+        .tokenStreamFactory() shouldBe a[JsonFactory]
+    }
+
+    "reject an unknown pekko-http-json.jackson.format" in {
+      val thrown = the[IllegalArgumentException] thrownBy JacksonDataFormat("yaml")
+      thrown.getMessage should include("supported: json, cbor")
     }
 
     "support loading DefaultScalaModule" in {
