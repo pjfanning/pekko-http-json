@@ -31,6 +31,7 @@ object Library {
   val jacksonModuleScala2  = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jackson2
   val jacksonModuleParamNames2 = "com.fasterxml.jackson.module"       % "jackson-module-parameter-names" % Version.jackson2
   val jacksonModuleScala3  = "tools.jackson.module"                  %% "jackson-module-scala"  % Version.jackson3
+  val jacksonDataformatCbor3 = "tools.jackson.dataformat"             % "jackson-dataformat-cbor" % Version.jackson3
   val json4sCore           = "io.github.json4s"                      %% "json4s-core"           % Version.json4s
   val json4sJackson        = "io.github.json4s"                      %% "json4s-jackson"        % Version.json4s
   val json4sNative         = "io.github.json4s"                      %% "json4s-native"         % Version.json4s
