@@ -30,14 +30,16 @@ import org.scalatest.wordspec.AsyncWordSpec
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-// Fory leaves the fields of a case class declared inside an `object` unset, so the types used here
-// are declared at the top level rather than in a companion object like the other modules' specs.
-final case class Foo(bar: String)
+object ForyJsonSupportSpec {
 
-final case class SnakeFoo(barBaz: String)
+  final case class Foo(bar: String)
+
+  final case class SnakeFoo(barBaz: String)
+}
 
 final class ForyJsonSupportSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
   import ForyJsonSupport._
+  import ForyJsonSupportSpec._
 
   private implicit val system: ActorSystem      = ActorSystem()
   private implicit val fooTypeRef: TypeRef[Foo] = ScalaTypeRef[Foo]

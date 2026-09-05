@@ -26,10 +26,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.StdIn
 
-// declared at the top level: Fory leaves the fields of a case class nested in an `object` unset
-final case class ExampleFoo(bar: String)
-
 object ExampleApp {
+
+  final case class ExampleFoo(bar: String)
 
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem = ActorSystem()

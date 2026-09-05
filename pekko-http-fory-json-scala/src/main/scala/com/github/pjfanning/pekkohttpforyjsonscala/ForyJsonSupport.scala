@@ -45,10 +45,6 @@ import scala.util.control.NonFatal
   * {{{
   * implicit val fooTypeRef: TypeRef[Foo] = ScalaTypeRef[Foo]
   * }}}
-  *
-  * Note that Fory does not populate the fields of a case class declared inside an `object`; such a
-  * value decodes with all of its fields left null rather than failing. Declare the types you
-  * exchange over HTTP at the top level of a file.
   */
 object ForyJsonSupport extends ForyJsonSupport {
 
