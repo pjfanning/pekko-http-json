@@ -10,6 +10,7 @@ object Library {
     val circe         = "0.14.16"
     val fory          = "1.7.4"
     val jackson2      = "2.22.3"
+    val jackson2Patch = "2.22.3.1"
     val jackson3      = "3.2.3"
     val json4s        = "4.1.1"
     val jsoniterScala = "2.41.0"
@@ -28,7 +29,7 @@ object Library {
   val circeGeneric         = "io.circe"                              %% "circe-generic"         % Version.circe
   val circeParser          = "io.circe"                              %% "circe-parser"          % Version.circe
   val foryJsonScala        = "org.apache.fory"                       %% "fory-json-scala"       % Version.fory
-  val jacksonModuleScala2  = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jackson2
+  val jacksonModuleScala2  = "com.fasterxml.jackson.module"          %% "jackson-module-scala"  % Version.jackson2Patch
   val jacksonModuleParamNames2 = "com.fasterxml.jackson.module"       % "jackson-module-parameter-names" % Version.jackson2
   val jacksonModuleScala3  = "tools.jackson.module"                  %% "jackson-module-scala"  % Version.jackson3
   val json4sCore           = "io.github.json4s"                      %% "json4s-core"           % Version.json4s
