@@ -8,7 +8,7 @@ object Library {
     val argonaut      = "6.3.13"
     val avro4s        = "4.1.2"
     val circe         = "0.14.16"
-    val fory          = "1.7.4"
+    val fory          = "1.7.5"
     val jackson2      = "2.22.3"
     val jackson2Patch = "2.22.3.1"
     val jackson3      = "3.2.3"
