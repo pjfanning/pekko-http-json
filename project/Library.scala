@@ -13,12 +13,12 @@ object Library {
     val jackson2Patch = "2.22.3.1"
     val jackson3      = "3.2.3"
     val json4s        = "4.1.1"
-    val jsoniterScala = "2.40.1"
+    val jsoniterScala = "2.41.2"
     val ninny         = "0.9.4"
     val play          = "3.0.6"
     val scalaTest     = "3.2.20"
     val upickle       = "4.4.3"
-    val zioJson       = "0.7.45"
+    val zioJson       = "1.0.0"
   }
   // format: off
   val pekkoHttp            = "org.apache.pekko"                      %% "pekko-http"            % Version.pekkoHttp
