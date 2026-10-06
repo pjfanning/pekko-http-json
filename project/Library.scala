@@ -7,7 +7,7 @@ object Library {
     val pekkoHttp     = "2.0.0-M1"
     val argonaut      = "6.3.13"
     val avro4s        = "4.1.2"
-    val circe         = "0.14.16"
+    val circe         = "0.14.17"
     val fory          = "1.7.6"
     val jackson2      = "2.22.3"
     val jackson2Patch = "2.22.3.1"
