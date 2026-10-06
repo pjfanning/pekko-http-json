@@ -3,14 +3,14 @@ import sbt.Keys._
 
 object Library {
   object Version {
-    val pekko         = "1.7.0"
-    val pekkoHttp     = "1.4.0"
+    val pekko         = "1.7.1"
+    val pekkoHttp     = "1.4.1"
     val argonaut      = "6.3.13"
     val avro4s        = "4.1.2"
-    val circe         = "0.14.16"
-    val fory          = "1.7.0"
-    val jackson2      = "2.22.2"
-    val jackson3      = "3.2.2"
+    val circe         = "0.14.17"
+    val fory          = "1.7.6"
+    val jackson2      = "2.22.3"
+    val jackson3      = "3.2.3"
     val json4s        = "4.1.1"
     val jsoniterScala = "2.40.1"
     val ninny         = "0.9.4"
