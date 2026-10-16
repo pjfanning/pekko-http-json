@@ -1,3 +1,5 @@
+import com.typesafe.tools.mima.core._
+
 // *****************************************************************************
 // Build settings
 // *****************************************************************************
@@ -201,11 +203,28 @@ lazy val `pekko-http-jackson3` =
     .settings(commonSettings, targetJava17, withScala3)
     .settings(mimaSettingsSince("3.1.0"))
     .settings(
+      // `mediaTypes` was widened from Seq[MediaType.WithFixedCharset] to Seq[MediaType] so that it
+      // can also hold the binary `application/cbor`. The erased signature is unchanged, and the
+      // wider type still accepts every override that compiled against the old one.
+      mimaBinaryIssueFilters += ProblemFilters.exclude[IncompatibleSignatureProblem](
+        "com.github.pjfanning.pekkohttpjackson3.JacksonSupport*.mediaTypes"
+      ),
+      // 3.1.0 had no `defaultObjectMapper` in the JacksonSupport trait - the no-arg static of that
+      // name in the trait's interface was an artifact of the trait's `import JacksonSupport._`,
+      // uncallable from Scala. It is now a real member, so that the mapper can follow `dataFormat`.
+      mimaBinaryIssueFilters += ProblemFilters.exclude[StaticVirtualMemberProblem](
+        "com.github.pjfanning.pekkohttpjackson3.JacksonSupport.defaultObjectMapper"
+      )
+    )
+    .settings(
       libraryDependencies ++= Seq(
         Library.pekkoHttp,
         Library.jacksonModuleScala3,
-        Library.pekkoStream % Provided,
-        Library.scalaTest   % Test
+        // only needed for `pekko-http-json.jackson.format = cbor` / `CborSupport`, so it is left
+        // for users of those to pull in themselves
+        Library.jacksonDataformatCbor3 % Optional,
+        Library.pekkoStream            % Provided,
+        Library.scalaTest              % Test
       )
     )
 
