@@ -9,7 +9,7 @@ object Library {
     val avro4s        = "4.1.2"
     val circe         = "0.14.17"
     val fory          = "1.7.7"
-    val jackson2      = "2.22.3"
+    val jackson2      = "2.22.4"
     val jackson2Patch = "2.22.3.1"
     val jackson3      = "3.2.3"
     val json4s        = "4.1.1"
