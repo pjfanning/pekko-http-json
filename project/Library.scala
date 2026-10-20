@@ -10,7 +10,7 @@ object Library {
     val circe         = "0.14.17"
     val fory          = "1.7.7"
     val jackson2      = "2.22.4"
-    val jackson3      = "3.2.3"
+    val jackson3      = "3.2.4"
     val json4s        = "4.1.1"
     val jsoniterScala = "2.41.7"
     val ninny         = "0.9.4"
