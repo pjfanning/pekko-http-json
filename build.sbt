@@ -39,7 +39,9 @@ inThisBuild(
       "-Wunused:imports"
     ),
     scalafmtOnCompile := true,
-    dynverSeparator   := "_" // the default `+` is not compatible with docker tags
+    dynverSeparator   := "_", // the default `+` is not compatible with docker tags
+    // TODO remove once pekko-http 2.0.0 is released
+    resolvers += "Apache Pekko Staging" at "https://repository.apache.org/content/repositories/orgapachepekko-1258/"
   )
 )
 
