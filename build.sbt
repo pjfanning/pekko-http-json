@@ -39,7 +39,7 @@ inThisBuild(
       "-Wunused:imports"
     ),
     scalafmtOnCompile := true,
-    dynverSeparator   := "_"
+    dynverSeparator   := "_" // the default `+` is not compatible with docker tags
   )
 )
 
